@@ -1,0 +1,11 @@
+Todo:
+*Behöver metoderna vara asynq eller ej?
+*Bindea alla shortcuts till korrekt meny
+*converter bool playmode/configmode 
+*fixa packoptions knapp
+*
+*
+Qol Fixes
+*fixa multiselect i questionpacken för massradering?
+*
+*

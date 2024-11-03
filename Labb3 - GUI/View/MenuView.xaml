@@ -4,9 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
-             xmlns:local="clr-namespace:Labb3___GUI.View"
+             xmlns:local="clr-namespace:Labb3___GUI.View" xmlns:viewmodel="clr-namespace:Labb3___GUI.ViewModel" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
     <Grid>
         <Menu>
             <MenuItem Header="_File">
@@ -20,21 +21,23 @@
                 <MenuItem Header="_Import Question Pack"
                           InputGestureText="Ctrl+I"
                           Icon="{fa:Icon cloudArrowDown}"/>
-                
+
                 <Separator/>
                 <MenuItem Header="E_xit"
                           Icon="{fa:Icon Home}"
                           InputGestureText="Alt + F4"/>
             </MenuItem>
-            
+
             <MenuItem Header="_Edit">
-                
+
                 <MenuItem Header="_Add Question"
                           InputGestureText="Insert"
+                          Command="{Binding ConfigurationViewModel.AddButtonCommand}"
+
                           Icon="{fa:Icon plus, Foreground=Green}"/>
                 <MenuItem Header="_Remove Question"
                           InputGestureText="Delete"
-                          Command="{Binding PlayerViewModel.UpdateButtonCommand}"
+                          Command="{Binding ConfigurationViewModel.RemoveButtonCommand}"
                           Icon="{fa:Icon minus, Foreground=Red}"/>
                 <MenuItem Header="Pack _Options"
                           InputGestureText="Ctrl+O"
@@ -44,11 +47,12 @@
             <MenuItem Header="_View" >
                 <MenuItem Header="_Play"
                           InputGestureText="Ctrl+P"
-                          Icon="{fa:Icon play}"/>
+                          Icon="{fa:Icon play}"
+                           Command="{Binding DataContext.SetPlayModeCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                 <MenuItem Header="_Edit"
                           InputGestureText="Ctrl+E"        
-                          Command="{Binding PlayerViewModel.UpdateButtonCommand}"
-                          Icon="{fa:Icon gears}"/>
+                          Icon="{fa:Icon gears}"
+                          Command="{Binding DataContext.SetConfigModeCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                 <Separator/>
                 <MenuItem Header="_Fullscreen"
                           InputGestureText="Alt+Enter"

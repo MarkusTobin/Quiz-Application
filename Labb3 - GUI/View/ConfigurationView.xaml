@@ -7,6 +7,7 @@
              xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
              DataContext="{Binding ConfigurationViewModel}"
              mc:Ignorable="d" 
+             Background="AliceBlue"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -94,40 +95,42 @@
                  Grid.Column="1"
                  Grid.Row="2"
                  Text="{Binding ActiveQuestion.Query, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Visibility="{Binding VisibilityMode}"/>
+                 Visibility="{Binding VisibilityMode}"
+                  />
         <StackPanel x:Name="stackPanel"
                     Grid.Column="1"
                     Grid.Row="3"
                     Visibility="{Binding VisibilityMode}">
 
-            
+
             <Label Content="Correct Answer"
                    Margin="10,0"/>
             <TextBox x:Name="textboxCorrectAnswer"
                      Margin="10,0"
-                     Text="{Binding ActiveQuestion.CorrectAnswer, Mode=TwoWay}"/>
-            
+                     Text="{Binding ActiveQuestion.CorrectAnswer, Mode=TwoWay}"
+                      />
+
             <Label Content="Incorrect answer1"
                    Margin="10,0"/>
             <TextBox x:Name="textboxIncorrectAnswer1"
                      Margin="10,0"
-                     Text="{Binding ActiveQuestion.IncorrectAnswer1, Mode=TwoWay}"/>
-            
+                     Text="{Binding ActiveQuestion.IncorrectAnswer1, Mode=TwoWay}"
+                     />
+
             <Label Content="Incorrect answer2"
                    Margin="10,0"/>
             <TextBox x:Name="textboxIncorrectAnswer2"
                      Margin="10,0"
-                     Text="{Binding ActiveQuestion.IncorrectAnswer2, Mode=TwoWay}"/>
-            
+                     Text="{Binding ActiveQuestion.IncorrectAnswer2, Mode=TwoWay}"
+                     />
+
             <Label Content="Incorrect answer3"
                    Margin="10,0"/>
             <TextBox x:Name="textboxIncorrectAnswer3"
                      Margin="10,0"
-                     Text="{Binding ActiveQuestion.IncorrectAnswer3, Mode=TwoWay}"/>
-            
-
+                     Text="{Binding ActiveQuestion.IncorrectAnswer3, Mode=TwoWay}"
+                     />
 
         </StackPanel>
-
     </Grid>
 </UserControl>

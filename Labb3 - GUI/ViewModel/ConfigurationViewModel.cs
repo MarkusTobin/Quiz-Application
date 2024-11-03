@@ -1,19 +1,18 @@
 ﻿using Labb3___GUI.Command;
 using Labb3___GUI.Model;
+using System.IO;
+using System.Text.Json;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Labb3___GUI.ViewModel
 {
     internal class ConfigurationViewModel : ViewModelBase
     {
+
         private readonly MainWindowViewModel? mainWindowViewModel;
         public DelegateCommand AddButtonCommand { get;}
         public DelegateCommand RemoveButtonCommand { get;}
-        private bool CanRemoveQuestion(object? arg)
-        {
-            return ActiveQuestion != null;
-        }
-        public QuestionPackViewModel? ActivePack { get => mainWindowViewModel.ActivePack; }
 
         public ConfigurationViewModel(MainWindowViewModel? mainWindowViewModel)
         {
@@ -29,9 +28,18 @@ namespace Labb3___GUI.ViewModel
             ActivePack?.Questions.Add(new Question("Question abc", "a", "b", "c", "d"));
             ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
         }
-        private bool RemoveActiveButton(object? arg)
+
+        public QuestionPackViewModel? ActivePack { get => mainWindowViewModel.ActivePack; }
+
+        private Question? _activeQuestion;
+        public Question? ActiveQuestion { get => _activeQuestion; set { _activeQuestion = value; RaisePropertyChanged();
+                VisibilityMode = (_activeQuestion != null) ? Visibility.Visible : Visibility.Hidden;
+                RemoveButtonCommand.RaiseCanExecuteChanged();
+            }
+        }
+        private bool RemoveActiveButton(object? arg)      //dont think it does anything, can get removed?
         {
-            return IsEnabled = true;
+            return IsEnabled = true;                
         }
         private void AddButton(object? obj) 
         {
@@ -47,16 +55,10 @@ namespace Labb3___GUI.ViewModel
         private void RemoveButton(object? obj)
         {
             ActivePack?.Questions.Remove(ActiveQuestion);
+            ActiveQuestion = ActivePack?.Questions.LastOrDefault();
             RemoveButtonCommand.RaiseCanExecuteChanged();
-            VisibilityMode = Visibility.Hidden;
-
         }
-        private Question? _activeQuestion;
-        public Question? ActiveQuestion { get => _activeQuestion; set { _activeQuestion = value; RaisePropertyChanged();
-                VisibilityMode = (_activeQuestion != null) ? Visibility.Visible : Visibility.Hidden;
-                RemoveButtonCommand.RaiseCanExecuteChanged();
-            }
-        }
+        private bool CanRemoveQuestion(object? arg) => ActiveQuestion != null;
 
 
         private Visibility _visibility;
@@ -64,5 +66,36 @@ namespace Labb3___GUI.ViewModel
 
         private bool _isEnabled;
         public bool IsEnabled { get => _isEnabled;  set { _isEnabled = value; RaisePropertyChanged();; } }
+        public void SaveQuestionPack(string filePath)
+        {
+            if (ActivePack != null)
+            {
+                // Serialize the QuestionPack to JSON
+                string json = JsonSerializer.Serialize(ActivePack, new JsonSerializerOptions { WriteIndented = true });
+
+                // Write the JSON to a file
+                File.WriteAllText(filePath, json);
+            }
+        }
+
+       /* public void LoadQuestionPack(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                // Read the JSON from the file
+                string json = File.ReadAllText(filePath);
+
+                // Deserialize the JSON back to a QuestionPack
+                var loadedPack = JsonSerializer.Deserialize<QuestionPack>(json);
+
+                if (loadedPack != null)
+                {
+                    ActivePack = loadedPack;
+                    ActiveQuestion = ActivePack.Questions.FirstOrDefault();
+                }
+            }
+        }*/
+
+
     }
 }

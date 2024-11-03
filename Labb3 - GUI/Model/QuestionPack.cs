@@ -9,6 +9,7 @@ namespace Labb3___GUI.Model
     enum Difficulty { Easy, Medium, Hard };
     internal class QuestionPack
     {
+        public QuestionPack() { }
         public QuestionPack(string name, Difficulty difficulty = Difficulty.Medium, int timeLimitInSeconds = 30)
         {
             Name = name;
