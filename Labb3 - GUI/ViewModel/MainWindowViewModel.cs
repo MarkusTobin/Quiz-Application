@@ -17,16 +17,16 @@ namespace Labb3___GUI.ViewModel
         {
             get => _isPlayMode;
             set
-            { 
-                    _isPlayMode = value;
-                    RaisePropertyChanged();
+            {
+                _isPlayMode = value;
+                RaisePropertyChanged();
             }
         }
         private bool _isConfigMode;
         public bool IsConfigMode
         {
             get => _isConfigMode;
-            private set 
+            set
             {
                 _isConfigMode = value;
                 RaisePropertyChanged();

@@ -12,8 +12,9 @@
         Title="MainWindow" Height="450" Width="800">
 
     <Window.Resources>
-        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>
+
 
     <Window.InputBindings>
         <KeyBinding Key="U" Modifiers="Ctrl" Command="{Binding PlayerViewModel.UpdateButtonCommand}" />
@@ -32,9 +33,9 @@
 
         <View:PlayerView 
             Grid.Row="1" 
-            Visibility="{Binding IsPlayMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            Visibility="{Binding IsPlayMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <View:ConfigurationView 
             Grid.Row="1" 
-            Visibility="{Binding IsConfigMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            Visibility="{Binding IsConfigMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </Grid>
 </Window>

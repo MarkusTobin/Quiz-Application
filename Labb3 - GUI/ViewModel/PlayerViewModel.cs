@@ -15,24 +15,22 @@ namespace Labb3___GUI.ViewModel
 {
     internal class PlayerViewModel : ViewModelBase
     {
+
         public void StartNewQuiz(IEnumerable<Question> questions)
         {
             if (questions == null || !questions.Any())
             {
-                // Handle the case where there are no questions
                 IsQuizFinished = true;
                 EndOfQuizMessage = "No questions available.";
                 return;
             }
 
-            // Shuffle questions and set up the quiz
             ShuffledQuestions = questions.OrderBy(q => Guid.NewGuid()).ToList();
             TotalQuestions = ShuffledQuestions.Count;
             CurrentQuestionNumber = 1;
             CurrentQuestion = ShuffledQuestions.FirstOrDefault();
             CorrectAnswerCount = 0;
 
-            // Reset timer for the new quiz
             TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
             timer.Start();
         }
@@ -179,24 +177,23 @@ namespace Labb3___GUI.ViewModel
              string selectedAnswer = obj as string;
             if (CurrentQuestion != null && selectedAnswer != null)
             {
-                // Reset button colors
+           
                 ResetButtonColors();
 
-                // Check if the answer is correct
+             
                 if (CurrentQuestion.CorrectAnswer == selectedAnswer)
                 {
                     CorrectAnswerCount++;
-                    SetButtonColor(selectedAnswer, Brushes.Green); // Set the selected button to green
+                    SetButtonColor(selectedAnswer, Brushes.Green);
                 }
                 else
                 {
-                    // Show correct answer
+                    
                     ShowCorrectAnswer();
-                    SetButtonColor(selectedAnswer, Brushes.Red); // Set the selected button to red
-                    SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green); // Highlight correct answer
+                    SetButtonColor(selectedAnswer, Brushes.Red); 
+                    SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green); 
                 }
 
-                // Move to the next question
                 NextQuestion();
             }
         }
@@ -231,14 +228,12 @@ namespace Labb3___GUI.ViewModel
         {
             if (AnswerSelected == ShowCorrectAnswer)
             {
-                //Logic för att visa färg för rätt fel svar
                 Thread.Sleep(1000);
                 CorrectAnswerCount++;
                 NextQuestion();
             }
             else
             {
-                //Logic för att visa färg för rätt fel svar
                 Thread.Sleep(1000);
                 NextQuestion();
             }

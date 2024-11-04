@@ -8,4 +8,4 @@ Todo:
 Qol Fixes
 *fixa multiselect i questionpacken för massradering?
 *
-*
+* playerview.visiblity 
