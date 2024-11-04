@@ -33,7 +33,7 @@ namespace Labb3___GUI.ViewModel
             }
         }
         public ObservableCollection<QuestionPackViewModel> Packs { get; set; }
-        public ConfigurationViewModel ConfigurationViewModel { get;}
+        public ConfigurationViewModel ConfigurationViewModel { get; }
         public PlayerViewModel PlayerViewModel { get; }
 
         public DelegateCommand StartQuizCommand { get; }
@@ -56,16 +56,16 @@ namespace Labb3___GUI.ViewModel
 
         private QuestionPackViewModel? _activePack;
         public QuestionPackViewModel? ActivePack
-		{
-			get => _activePack;
-			set 
-			{ 
-				_activePack = value;
+        {
+            get => _activePack;
+            set
+            {
+                _activePack = value;
                 RaisePropertyChanged();
                 ConfigurationViewModel.RaisePropertyChanged(nameof(ConfigurationViewModel.ActivePack));
                 ConfigurationViewModel.ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
             }
-		}
+        }
         private void StartQuiz(object obj)
         {
             if (ActivePack == null || !ActivePack.Questions.Any())
@@ -84,7 +84,7 @@ namespace Labb3___GUI.ViewModel
 
         private void SetPlayMode()
         {
-            IsPlayMode = true; 
+            IsPlayMode = true;
             IsConfigMode = false;
         }
     }

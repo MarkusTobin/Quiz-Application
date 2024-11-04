@@ -33,9 +33,11 @@
 
         <View:PlayerView 
             Grid.Row="1" 
-            Visibility="{Binding IsPlayMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            Visibility="{Binding DataContext.IsPlayMode, RelativeSource={RelativeSource AncestorType=Window}, 
+            Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <View:ConfigurationView 
             Grid.Row="1" 
-            Visibility="{Binding IsConfigMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            Visibility="{Binding DataContext.IsConfigMode, RelativeSource={RelativeSource AncestorType=Window},
+            Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </Grid>
 </Window>

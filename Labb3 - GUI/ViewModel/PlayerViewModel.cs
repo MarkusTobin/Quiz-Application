@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -15,7 +16,7 @@ namespace Labb3___GUI.ViewModel
 {
     internal class PlayerViewModel : ViewModelBase
     {
-
+        public bool IsPlayMode => mainWindowViewModel.IsPlayMode;
         public void StartNewQuiz(IEnumerable<Question> questions)
         {
             if (questions == null || !questions.Any())
@@ -56,7 +57,7 @@ namespace Labb3___GUI.ViewModel
         //
         private Question _currentQuestion; // maybe QuiestionViewmodel instead of Question?
         public Question CurrentQuestion    // maybe QuiestionViewmodel instead of Question?
-        { 
+        {
             get => _currentQuestion;
             set
             {
@@ -121,7 +122,7 @@ namespace Labb3___GUI.ViewModel
         private bool _isQuizFinished;
         public bool IsQuizFinished
         {
-            get => _isQuizFinished; 
+            get => _isQuizFinished;
             set
             {
                 _isQuizFinished = value;
@@ -174,13 +175,13 @@ namespace Labb3___GUI.ViewModel
 
         private void AnswerSelected(object? obj)
         {
-             string selectedAnswer = obj as string;
+            string selectedAnswer = obj as string;
             if (CurrentQuestion != null && selectedAnswer != null)
             {
-           
+
                 ResetButtonColors();
 
-             
+
                 if (CurrentQuestion.CorrectAnswer == selectedAnswer)
                 {
                     CorrectAnswerCount++;
@@ -188,10 +189,10 @@ namespace Labb3___GUI.ViewModel
                 }
                 else
                 {
-                    
+
                     ShowCorrectAnswer();
-                    SetButtonColor(selectedAnswer, Brushes.Red); 
-                    SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green); 
+                    SetButtonColor(selectedAnswer, Brushes.Red);
+                    SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green);
                 }
 
                 NextQuestion();
@@ -199,7 +200,7 @@ namespace Labb3___GUI.ViewModel
         }
         private void TimerTick(object sender, EventArgs e)
         {
-            if (TimeRemaining > 0) 
+            if (TimeRemaining > 0)
             {
                 timer.Stop();
                 EndOfQuizMessage = "Time is up, guess quicker next time!";
@@ -212,7 +213,7 @@ namespace Labb3___GUI.ViewModel
             if (CurrentQuestionNumber < TotalQuestions)
             {
                 CurrentQuestionNumber++;
-                CurrentQuestion = ShuffledQuestions[CurrentQuestionNumber-1];
+                CurrentQuestion = ShuffledQuestions[CurrentQuestionNumber - 1];
                 TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
                 timer.Start();
             }
