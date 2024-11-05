@@ -1,5 +1,7 @@
 ﻿using Labb3___GUI.Command;
+using Labb3___GUI.Dialogs;
 using Labb3___GUI.Model;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
@@ -14,7 +16,35 @@ namespace Labb3___GUI.ViewModel
         public DelegateCommand AddButtonCommand { get;}
         public DelegateCommand RemoveButtonCommand { get;}
 
-        public ConfigurationViewModel(MainWindowViewModel? mainWindowViewModel)
+
+        //Pilla med pack
+        public DelegateCommand EditPackCommand { get;}
+        public void EditPack(object? parameter)
+        {
+            if (ActivePack != null)
+            {
+                var dialog = new PackOptionsDialog();
+                var dialogViewModel = new QuestionPack
+                {
+                    Name = ActivePack.Name,
+                    Difficulty = ActivePack.Difficulty,
+                    TimeLimitInSeconds = ActivePack.TimeLimitInSeconds
+                };
+
+                dialog.DataContext = dialogViewModel;
+
+                bool? result = dialog.ShowDialog();
+                if (result == true)
+                {
+                    ActivePack.Name = dialogViewModel.Name;
+                    ActivePack.Difficulty = dialogViewModel.Difficulty;
+                    ActivePack.TimeLimitInSeconds = dialogViewModel.TimeLimitInSeconds;
+                }
+            }
+        }
+
+        //Pilla med pack slut
+        public ConfigurationViewModel(MainWindowViewModel mainWindowViewModel)
         {
             this.mainWindowViewModel = mainWindowViewModel;
             VisibilityMode = Visibility.Hidden;
@@ -24,12 +54,23 @@ namespace Labb3___GUI.ViewModel
 
             AddButtonCommand = new DelegateCommand(AddButton);
             RemoveButtonCommand = new DelegateCommand(RemoveButton, CanRemoveQuestion);
+            EditPackCommand = new DelegateCommand(EditPack, CanEditPack);
 
             ActivePack?.Questions.Add(new Question("Question abc", "a", "b", "c", "d"));
             ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
         }
-
+        private ObservableCollection<Question> questions; //nytt inlagt, ta bort?
         public QuestionPackViewModel? ActivePack { get => mainWindowViewModel.ActivePack; }
+
+        public ObservableCollection<Question> Questions
+        {
+            get => questions;
+            set
+            {
+                questions = value;
+                RaisePropertyChanged(nameof(Questions));
+            }
+        }
 
         private Question? _activeQuestion;
         public Question? ActiveQuestion { get => _activeQuestion; set { _activeQuestion = value; RaisePropertyChanged();
@@ -78,24 +119,27 @@ namespace Labb3___GUI.ViewModel
             }
         }
 
-       /* public void LoadQuestionPack(string filePath)
+        /* public void LoadQuestionPack(string filePath)
+         {
+             if (File.Exists(filePath))
+             {
+                 // Read the JSON from the file
+                 string json = File.ReadAllText(filePath);
+
+                 // Deserialize the JSON back to a QuestionPack
+                 var loadedPack = JsonSerializer.Deserialize<QuestionPack>(json);
+
+                 if (loadedPack != null)
+                 {
+                     ActivePack = loadedPack;
+                     ActiveQuestion = ActivePack.Questions.FirstOrDefault();
+                 }
+             }
+         }*/
+
+        private bool CanEditPack(object arg)
         {
-            if (File.Exists(filePath))
-            {
-                // Read the JSON from the file
-                string json = File.ReadAllText(filePath);
-
-                // Deserialize the JSON back to a QuestionPack
-                var loadedPack = JsonSerializer.Deserialize<QuestionPack>(json);
-
-                if (loadedPack != null)
-                {
-                    ActivePack = loadedPack;
-                    ActiveQuestion = ActivePack.Questions.FirstOrDefault();
-                }
-            }
-        }*/
-
-
+            return ActivePack != null;
+        }
     }
 }

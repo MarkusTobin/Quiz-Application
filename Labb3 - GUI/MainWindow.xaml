@@ -21,6 +21,7 @@
         <KeyBinding Key="Insert" Command="{Binding ConfigurationViewModel.AddButtonCommand}" />
         <KeyBinding Key="Delete" Command="{Binding ConfigurationViewModel.RemoveButtonCommand}" />
         <KeyBinding Key="P" Modifiers="Ctrl" Command="{Binding SetPlayModeCommand}" />
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding ConfigurationViewModel.EditPackCommand}" />
     </Window.InputBindings>
 
     <Grid>

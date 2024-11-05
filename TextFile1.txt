@@ -9,3 +9,22 @@ Qol Fixes
 *fixa multiselect i questionpacken för massradering?
 *
 * playerview.visiblity 
+
+
+* EditCommand
+* kan kanske ta bort alla namn på buttons och liknande i xaml om de är länkade med saker för namnsättning och commands
+
+
+*
+*Bugs att fixa: Tar man bort alla packs så blir pack edit inaktiverat
+*Ska inte gå att ta bort packet som är sist kvar?
+
+* Fixa så enum-binding med difficulty convertas rätt
+
+*EnumConvertern är kanske onödig, kolla om det ska tas bort?
+
+* Bindea pack option till knappen
+
+* File -> new question pack ska öppna en dialog med cancel + create
+
+* Selected pack ska visa svårighetsgrad i rutan

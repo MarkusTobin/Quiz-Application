@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
-             xmlns:local="clr-namespace:Labb3___GUI.View" xmlns:viewmodel="clr-namespace:Labb3___GUI.ViewModel" 
+             xmlns:conv="clr-namespace:Labb3___GUI.Converters" 
+             xmlns:local="clr-namespace:Labb3___GUI.View" xmlns:viewmodel="clr-namespace:Labb3___GUI.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -12,11 +13,29 @@
         <Menu>
             <MenuItem Header="_File">
                 <MenuItem Header="_New Question Pack"
-                      Icon="{fa:Icon folderPlus, Foreground=Green}"/>
-                <MenuItem Header="_Select Question Pack"
-                      Icon="{fa:Icon folderOpen}"/>
+                      Icon="{fa:Icon folderPlus, Foreground=Green}"
+                          Command="{Binding DataContext.AddPackCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+
+                <MenuItem Header="_Select Question Pack" Icon="{fa:Icon folderOpen}">
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                    <MenuItem.ItemsSource>
+                        <Binding Path="Packs" />
+                    </MenuItem.ItemsSource>
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Command" Value="{Binding DataContext.SelectPackCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <Setter Property="CommandParameter" Value="{Binding}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+
                 <MenuItem Header="_Delete Question Pack"
-                      Icon="{fa:Icon folderMinus, Foreground=Red}"/>
+                      Icon="{fa:Icon folderMinus, Foreground=Red}"
+                          Command="{Binding DataContext.RemovePackCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
                 <Separator/>
                 <MenuItem Header="_Import Question Pack"
                           InputGestureText="Ctrl+I"
@@ -41,7 +60,8 @@
                           Icon="{fa:Icon minus, Foreground=Red}"/>
                 <MenuItem Header="Pack _Options"
                           InputGestureText="Ctrl+O"
-                          Icon="{fa:Icon sliders}"/>
+                          Icon="{fa:Icon sliders}"
+                          Command="{Binding DataContext.EditPackCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
             </MenuItem>
 
             <MenuItem Header="_View" >

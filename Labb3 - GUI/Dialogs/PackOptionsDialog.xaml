@@ -1,14 +1,16 @@
 ﻿<Window x:Class="Labb3___GUI.Dialogs.PackOptionsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="New Question Pack" Height="200" Width="200" ResizeMode="NoResize"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        xmlns:viewmodel="clr-namespace:Labb3___GUI.ViewModel" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        Title="Pack Options" Height="300" Width="300" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
-    <Grid Margin="10">
 
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -16,26 +18,22 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Row="0" Width="200">
-
             <Label Content="Pack Name:" FontWeight="Bold"/>
-            <TextBox Text="&lt;PackName&gt;"/>
+            <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
 
             <TextBlock Text="Difficulty:" FontWeight="Bold"/>
-            <ComboBox SelectedIndex="1">
-                <ComboBoxItem>Easy</ComboBoxItem>
-                <ComboBoxItem>Medium</ComboBoxItem>
-                <ComboBoxItem>Hard</ComboBoxItem>
+            <ComboBox SelectedIndex="{Binding DifficultyIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ComboBoxItem Content="Easy" Tag="0"/>
+                <ComboBoxItem Content="Medium" Tag="1"/>
+                <ComboBoxItem Content="Hard" Tag="2"/>
             </ComboBox>
 
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="Time Limit:" FontWeight="Bold"/>
-                <TextBlock Text="30" />
-                <TextBlock Text="seconds" />
-
+                <TextBlock Text="{Binding TimeLimitInSeconds, Mode=TwoWay, StringFormat={}{0} seconds}"/>
             </StackPanel>
 
-            <Slider Width="100"  Minimum="5" Maximum="60" Value="30" />
-
+            <Slider Width="100" Minimum="5" Maximum="60" Value="{Binding TimeLimitInSeconds,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
     </Grid>
 </Window>
