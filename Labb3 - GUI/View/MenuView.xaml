@@ -42,9 +42,10 @@
                           Icon="{fa:Icon cloudArrowDown}"/>
 
                 <Separator/>
-                <MenuItem Header="E_xit"
+                <MenuItem Header="Save and E_xit"
                           Icon="{fa:Icon Home}"
-                          InputGestureText="Alt + F4"/>
+                          InputGestureText="Alt + F4"
+                          Command= "{Binding DataContext.ExitAndSaveCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
             </MenuItem>
 
             <MenuItem Header="_Edit">
@@ -76,6 +77,7 @@
                 <Separator/>
                 <MenuItem Header="_Fullscreen"
                           InputGestureText="Alt+Enter"
+                          Command="{Binding ToggleFullScreenCommand}"
                           Icon="{fa:Icon maximize}"/>
 
 

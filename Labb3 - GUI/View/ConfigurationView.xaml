@@ -9,7 +9,7 @@
              d:DataContext="{d:DesignInstance Type=viewmodel:ConfigurationViewModel}"
              DataContext="{Binding ConfigurationViewModel}"
              mc:Ignorable="d" 
-             Background="AliceBlue"
+             Background="LightBlue"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>

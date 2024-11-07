@@ -19,7 +19,6 @@ namespace Labb3___GUI.ViewModel
     internal class PlayerViewModel : ViewModelBase
     {
         public string QuestionOfTotalQuestion => $"Question {CurrentQuestionNumber} of {TotalQuestions}";
-        private bool _isPlayMode;
         private string[] _currentAnswers;
         private readonly Random random = new Random();
         private QuestionPackViewModel ActivePack;
@@ -366,13 +365,14 @@ namespace Labb3___GUI.ViewModel
             Option3StatusColor = Brushes.White;
             Option4StatusColor = Brushes.White;
         }
-        // byta namn på _option1StatusColor etc till CorrectAnswer --> IncorrectAnswer1-3
+
         private void SetButtonColor(string answer, SolidColorBrush color)
         {
-            if (answer == CurrentQuestion.CorrectAnswer) Option1StatusColor = color;
-            else if (answer == CurrentQuestion.IncorrectAnswer1) Option2StatusColor = color;
-            else if (answer == CurrentQuestion.IncorrectAnswer2) Option3StatusColor = color;
-            else if (answer == CurrentQuestion.IncorrectAnswer3) Option4StatusColor = color;
+
+            if (answer == _currentAnswers[0]) Option1StatusColor = color;  
+            else if (answer == _currentAnswers[1]) Option2StatusColor = color;
+            else if (answer == _currentAnswers[2]) Option3StatusColor = color; 
+            else if (answer == _currentAnswers[3]) Option4StatusColor = color; 
         }
 
         private SolidColorBrush _option1StatusColor;

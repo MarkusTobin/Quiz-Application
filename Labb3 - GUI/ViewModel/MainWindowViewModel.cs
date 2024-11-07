@@ -13,16 +13,18 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml.Linq;
+using Labb3___GUI.Json;
 
 namespace Labb3___GUI.ViewModel
 {
     internal class MainWindowViewModel : ViewModelBase
     {
-
+        private ObservableCollection<QuestionPackViewModel> _packs; //json
         public ObservableCollection<QuestionPackViewModel> Packs { get; set; } = new ObservableCollection<QuestionPackViewModel>(); //
         public ConfigurationViewModel ConfigurationViewModel { get; }
         public PlayerViewModel PlayerViewModel { get; }
         private QuestionPackViewModel? _activePack;
+
         public DelegateCommand StartQuizCommand { get; }
         public DelegateCommand SetConfigModeCommand { get; }
         public DelegateCommand SetPlayModeCommand { get; }
@@ -32,17 +34,24 @@ namespace Labb3___GUI.ViewModel
         public DelegateCommand EditPackCommand { get; }   //nytt inlagt
         public DelegateCommand SelectPackCommand { get; } //nytt inlagt
         public DelegateCommand CloseDialogCommand { get; }
+        public DelegateCommand ToggleFullScreenCommand { get; set; }
+        public DelegateCommand SaveToJsonCommand {  get; set; }
+        public DelegateCommand ExitAndSaveCommand { get; }
 
+        private readonly Window _mainWindow;
         private readonly PlayerViewModel _playerViewModel;
         private ObservableCollection<Question> _questions;
+
+       
         public MainWindowViewModel()
         {
-
+            LoadPacksAsync();
             ConfigurationViewModel = new ConfigurationViewModel(this);
 
+            if (Packs == null || Packs.Count == 0)
+            {
+
             var defaultPack = new QuestionPack("My Question Pack", Difficulty.Medium, 30);
-
-
             var defaultQuestion = new Question("What is 2 + 2?", "4", "3", "5", "6");
             var defaultQuestion2 = new Question("What is 4 + 4?", "8", "3", "5", "6");
             defaultPack.Questions.Add(defaultQuestion);
@@ -53,6 +62,7 @@ namespace Labb3___GUI.ViewModel
 
             Packs = new ObservableCollection<QuestionPackViewModel> { defaultPackViewModel };
             ActivePack = defaultPackViewModel;
+            }
 
             PlayerViewModel = new PlayerViewModel(this);
             if (ActivePack?.Questions != null && ActivePack.Questions.Any())
@@ -76,11 +86,35 @@ namespace Labb3___GUI.ViewModel
             StartQuizCommand = new DelegateCommand(StartQuiz);
             SetConfigModeCommand = new DelegateCommand(_ => SetConfigMode());
             SetPlayModeCommand = new DelegateCommand(_ => SetPlayMode());//här?
+            ToggleFullScreenCommand = new DelegateCommand(ToggleFullScreen);
+            SaveToJsonCommand = new DelegateCommand(SaveToJson);
+            ExitAndSaveCommand = new DelegateCommand(ExitAndSave);
 
             IsConfigMode = true;
             IsPlayMode = false; // ta bort?
         }
 
+        private async void SaveToJson(object parameter)
+        {
+            await JsonSaveLoad.SavePacksToJson(this);
+        }
+
+        private async void LoadPacksAsync()
+        {
+            await JsonSaveLoad.LoadPacksFromJson(this);
+        }
+
+        //json
+        /*private async void ExitProgram(object obj)
+        {
+            var result = MessageBox.Show("Are you sure you want to exit?", "Exit Program",
+                MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                await JsonHandler.SavePacksToJson(this);
+                Application.Current.Shutdown();
+            }
+        }*/
         //gammalt
         private void SelectPack(object selectedPackObj)
         {
@@ -233,12 +267,46 @@ namespace Labb3___GUI.ViewModel
             IsPlayMode = true;
             IsConfigMode = false;
         }
-        //gammalt
-        /*public void AddQuestion(Question newQuestion)
+
+        private void ToggleFullScreen(object parameter)
         {
-            ActivePack.Questions.Add(newQuestion);  // Add new question
-            PlayerViewModel.StartNewQuiz(ActivePack.Questions);  // Refresh the quiz with the updated list
-        }*/
+            var mainWindow = System.Windows.Application.Current.MainWindow; ; // Get the main window from the application context
+
+            if (mainWindow == null)
+            {
+                Debug.WriteLine("Error: MainWindow is not available.");
+                return;  // Exit if no main window is available
+            }
+
+            // Toggle between fullscreen and normal mode
+            if (mainWindow.WindowState == WindowState.Normal)
+            {
+                mainWindow.WindowState = WindowState.Maximized;
+                mainWindow.WindowStyle = WindowStyle.None;  // Remove border for fullscreen
+            }
+            else
+            {
+                mainWindow.WindowState = WindowState.Normal;
+                mainWindow.WindowStyle = WindowStyle.SingleBorderWindow;  // Restore window border
+            }
+        }
+        private async void ExitAndSave(object parameter)
+        {
+
+            var result = System.Windows.MessageBox.Show(
+                "You will save all Questionpacks on exit. Do you want to continue?",
+                "Confirm Exit",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+            );
+                RaisePropertyChanged(nameof(Packs));
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await JsonSaveLoad.SavePacksToJson(this);
+                System.Windows.Application.Current.Shutdown();
+            }
+        }
 
     }
 }

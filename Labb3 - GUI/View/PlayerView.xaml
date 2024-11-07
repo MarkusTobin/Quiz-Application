@@ -9,6 +9,8 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+
         <Style x:Key="QuizButtonStyle" TargetType="Button">
             <Setter Property="FontSize" Value="15" />
             <Setter Property="BorderBrush" Value="Black" />
@@ -16,11 +18,10 @@
             <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource Self}}" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource Self}}" />
+                    <Setter Property="Opacity" Value="0.8"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </UserControl.Resources>
 
     <Grid>
@@ -66,37 +67,37 @@
             <!-- Answer Buttons -->
             <UniformGrid Rows="2" Columns="2" 
                          HorizontalAlignment="Center" 
-                         VerticalAlignment="Bottom" 
+                         VerticalAlignment="Bottom"
                          Width="600" 
                          Height="150">
-
-                <Button Content="{Binding CurrentQuestion.CorrectAnswer}" 
+                <Border BorderBrush="{Binding Option1StatusColor}" BorderThickness="5" CornerRadius="10">
+                    <Button Content="{Binding Answer1}" 
                         Command="{Binding AnswerCommand}" 
-                        CommandParameter="{Binding CurrentQuestion.CorrectAnswer}" 
+                        CommandParameter="{Binding Answer1}" 
                         Background="{Binding Option1StatusColor}"
-                        Style="{StaticResource QuizButtonStyle}" 
-                        Margin="8"/>
-
-                <Button Content="{Binding CurrentQuestion.IncorrectAnswer1}" 
+                        Style="{StaticResource QuizButtonStyle}" />
+                </Border>
+                <Border BorderBrush="{Binding Option2StatusColor}" BorderThickness="5" CornerRadius="10">
+                    <Button Content="{Binding Answer2}" 
                         Command="{Binding AnswerCommand}" 
-                        CommandParameter="{Binding CurrentQuestion.IncorrectAnswer1}" 
+                        CommandParameter="{Binding Answer2}" 
                         Background="{Binding Option2StatusColor}"
-                        Style="{StaticResource QuizButtonStyle}" 
-                        Margin="8"/>
-
-                <Button Content="{Binding CurrentQuestion.IncorrectAnswer2}" 
+                        Style="{StaticResource QuizButtonStyle}" />
+                </Border>
+                <Border BorderBrush="{Binding Option3StatusColor}" BorderThickness="5" CornerRadius="10">
+                    <Button Content="{Binding Answer3}" 
                         Command="{Binding AnswerCommand}" 
-                        CommandParameter="{Binding CurrentQuestion.IncorrectAnswer2}" 
+                        CommandParameter="{Binding Answer3}" 
                         Background="{Binding Option3StatusColor}"
-                        Style="{StaticResource QuizButtonStyle}" 
-                        Margin="8"/>
-
-                <Button Content="{Binding CurrentQuestion.IncorrectAnswer3}" 
+                        Style="{StaticResource QuizButtonStyle}" />
+                </Border>
+                <Border BorderBrush="{Binding Option4StatusColor}" BorderThickness="5" CornerRadius="10">
+                    <Button Content="{Binding Answer4}" 
                         Command="{Binding AnswerCommand}" 
-                        CommandParameter="{Binding CurrentQuestion.IncorrectAnswer3}" 
+                        CommandParameter="{Binding Answer4}" 
                         Background="{Binding Option4StatusColor}"
-                        Style="{StaticResource QuizButtonStyle}" 
-                        Margin="8"/>
+                        Style="{StaticResource QuizButtonStyle}" />
+                </Border>
             </UniformGrid>
         </StackPanel>
 

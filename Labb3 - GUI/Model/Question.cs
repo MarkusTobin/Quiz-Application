@@ -19,6 +19,7 @@ namespace Labb3___GUI.Model
             IncorrectAnswer2 = "Incorrect Answer 2";
             IncorrectAnswer3 = "Incorrect Answer 3";
         }
+        [JsonConstructor]
         public Question(string query, string correctAnswer, string incorrectAnswer1, string incorrectAnswer2, string incorrectAnswer3)
         {
             Query = query;
@@ -46,7 +47,7 @@ namespace Labb3___GUI.Model
 
             return options.OrderBy(x => Guid.NewGuid()).ToList(); // Randomize order
         }
-        //[JsonIgnore]
+        
         public ObservableCollection<string> AnswerOptions { get; }  //ta bort alla AnswerOptions?
         public ObservableCollection<Question> Questions { get; } = new ObservableCollection<Question>();
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Labb3___GUI.Model
@@ -14,12 +15,14 @@ namespace Labb3___GUI.Model
         public const int HardIndex = 2;
 
         public QuestionPack() { }
-        public QuestionPack(string name, Difficulty difficulty = Difficulty.Medium, int timeLimitInSeconds = 30)
+
+        [JsonConstructor]
+        public QuestionPack(string name, Difficulty difficulty = Difficulty.Medium, int timeLimitInSeconds = 30, List<Question> questions = null)
         {
             Name = name;
             Difficulty = difficulty;
             TimeLimitInSeconds = timeLimitInSeconds;
-            Questions = new List<Question>();
+            Questions = questions ?? new List<Question>();
         }
 
 
