@@ -46,7 +46,6 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged(nameof(DisplayText)); // Update DisplayText if it depends on Difficulty
             }
         }
-        private int _timeLimitInSeconds = 30;
         public int TimeLimitInSeconds
         {
             get => _model.TimeLimitInSeconds;

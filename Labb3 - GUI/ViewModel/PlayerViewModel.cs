@@ -12,7 +12,6 @@ namespace Labb3___GUI.ViewModel
         public string QuestionOfTotalQuestion => $"Question {CurrentQuestionNumber} of {TotalQuestions}";
         private string[] _currentAnswers;
         private readonly Random random = new Random();
-        private QuestionPackViewModel ActivePack;
         public void StartNewQuiz(List<Question> questions)
         {
             ShuffledQuestions = questions.OrderBy(q => Guid.NewGuid()).ToList();

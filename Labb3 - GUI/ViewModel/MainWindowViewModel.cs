@@ -28,9 +28,6 @@ namespace Labb3___GUI.ViewModel
         public DelegateCommand SaveToJsonCommand {  get; set; }
         public DelegateCommand ExitAndSaveCommand { get; }
 
-        private readonly Window _mainWindow;
-        private readonly PlayerViewModel _playerViewModel;
-        private ObservableCollection<Question> _questions;
 
         public MainWindowViewModel()
         {
