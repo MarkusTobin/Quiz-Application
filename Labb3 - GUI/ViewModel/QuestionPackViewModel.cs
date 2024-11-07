@@ -6,8 +6,6 @@ namespace Labb3___GUI.ViewModel
     internal class QuestionPackViewModel : ViewModelBase
     {
         private readonly QuestionPack _model;
-
-
         public QuestionPackViewModel(QuestionPack model)
         {
             _model = model;
@@ -16,7 +14,6 @@ namespace Labb3___GUI.ViewModel
         }
         public QuestionPack Model => _model;
         public string DisplayText => $"{Name} ({Difficulty})"; //nytt
-
         public string Name
         {
             get => _model.Name;

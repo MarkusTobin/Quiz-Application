@@ -2,22 +2,16 @@
 using Labb3___GUI.Dialogs;
 using Labb3___GUI.Model;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Text.Json;
 using System.Windows;
-using System.Windows.Input;
 
 namespace Labb3___GUI.ViewModel
 {
     internal class ConfigurationViewModel : ViewModelBase
     {
-
         private readonly MainWindowViewModel? mainWindowViewModel;
         public DelegateCommand AddButtonCommand { get; }
         public DelegateCommand RemoveButtonCommand { get; }
 
-
-        //Pilla med pack
         public DelegateCommand EditPackCommand { get; }
         public void EditPack(object? parameter)
         {
@@ -43,7 +37,6 @@ namespace Labb3___GUI.ViewModel
             }
         }
 
-
         public ConfigurationViewModel(MainWindowViewModel mainWindowViewModel)
         {
             this.mainWindowViewModel = mainWindowViewModel;
@@ -57,7 +50,7 @@ namespace Labb3___GUI.ViewModel
             ActivePack?.Questions.Add(new Question("Question abc", "a", "b", "c", "d"));
             ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
         }
-        private ObservableCollection<Question> questions; //nytt inlagt, ta bort?
+        private ObservableCollection<Question> questions;
         public QuestionPackViewModel? ActivePack { get => mainWindowViewModel.ActivePack; }
 
         public ObservableCollection<Question> Questions
@@ -80,7 +73,7 @@ namespace Labb3___GUI.ViewModel
                 RemoveButtonCommand.RaiseCanExecuteChanged();
             }
         }
-        private bool RemoveActiveButton(object? arg)      //dont think it does anything, can get removed?
+        private bool RemoveActiveButton(object? arg)
         {
             return IsEnabled = true;
         }
@@ -113,6 +106,5 @@ namespace Labb3___GUI.ViewModel
         {
             return ActivePack != null;
         }
-
     }
 }

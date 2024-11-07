@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:viewmodel="clr-namespace:Labb3___GUI.ViewModel" 
              DataContext="{Binding PlayerViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -25,8 +24,6 @@
     </UserControl.Resources>
 
     <Grid>
-
-        <!-- Start Button -->
         <Button Content="Start Quiz" 
                 Command="{Binding StartTimerCommand}" 
                 Visibility="{Binding IsStartButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" 
@@ -34,14 +31,12 @@
                 VerticalAlignment="Center"
                 FontSize="20" />
 
-        <!-- Main Quiz Panel -->
         <StackPanel Orientation="Vertical" 
                     HorizontalAlignment="Center" 
                     VerticalAlignment="Center" 
                     Visibility="{Binding IsQuizRunning, Converter={StaticResource BoolToVisibilityConverter}}" 
                     Margin="10">
 
-            <!-- Question Text -->
             <TextBlock Text="{Binding CurrentQuestion.Query}"
                        FontSize="30"
                        FontWeight="Bold"
@@ -49,14 +44,12 @@
                        VerticalAlignment="Center"
                        Margin="10"/>
 
-            <!-- Question Count Display -->
             <TextBlock Text="{Binding QuestionOfTotalQuestion}"
                        FontSize="15"
                        FontWeight="Bold"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
 
-            <!-- Timer Display -->
             <TextBlock Text="{Binding TimeRemaining}"
                        FontSize="25"
                        FontWeight="Bold"
@@ -64,7 +57,6 @@
                        VerticalAlignment="Top"
                        Margin="15" />
 
-            <!-- Answer Buttons -->
             <UniformGrid Rows="2" Columns="2" 
                          HorizontalAlignment="Center" 
                          VerticalAlignment="Bottom"
@@ -101,7 +93,6 @@
             </UniformGrid>
         </StackPanel>
 
-        <!-- Quiz Completion Screen -->
         <StackPanel x:Name="quizFinishedScreen" 
                     Orientation="Vertical" 
                     HorizontalAlignment="Center" 
@@ -129,6 +120,5 @@
                     HorizontalAlignment="Center"
                     Margin="10"/>
         </StackPanel>
-
     </Grid>
 </UserControl>

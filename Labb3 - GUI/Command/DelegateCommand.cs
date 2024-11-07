@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace Labb3___GUI.Command
 {
@@ -25,7 +20,6 @@ namespace Labb3___GUI.Command
         {
             return canExecute is null ? true: canExecute(parameter);
         }
-
         public void Execute(object? parameter)
         {
             execute(parameter);

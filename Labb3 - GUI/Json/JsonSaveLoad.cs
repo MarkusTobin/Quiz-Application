@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows;
 using Labb3___GUI.Model;
 using Labb3___GUI.ViewModel;
@@ -28,8 +24,6 @@ namespace Labb3___GUI.Json
                 string content = JsonSerializer.Serialize(mainWindowViewModel.Packs);
                 await File.WriteAllTextAsync(filePath, content);
                 MessageBox.Show($"Saved!", "Packs are", MessageBoxButton.OK);
-
-               
             }
             catch (Exception ex)
             {

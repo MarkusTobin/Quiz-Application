@@ -1,16 +1,7 @@
 ﻿using Labb3___GUI.Command;
 using Labb3___GUI.Model;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -24,9 +15,6 @@ namespace Labb3___GUI.ViewModel
         private QuestionPackViewModel ActivePack;
         public void StartNewQuiz(List<Question> questions)
         {
-
-            //questions gets null
-            
             ShuffledQuestions = questions.OrderBy(q => Guid.NewGuid()).ToList();
 
             if (ShuffledQuestions.Any())
@@ -50,7 +38,6 @@ namespace Labb3___GUI.ViewModel
         private DispatcherTimer timer;
 
 
-        //Fixa commands
         private Question _currentQuestion;
         public DelegateCommand AnswerCommand { get; }
 
@@ -67,7 +54,6 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged(nameof(CurrentAnswerOptions));
             }
         }
-        //
         public Question CurrentQuestion
         {
             get => _currentQuestion;
@@ -98,12 +84,12 @@ namespace Labb3___GUI.ViewModel
         private string[] GetShuffledAnswers(Question question)
         {
             var answers = new List<string>
-    {
+        {
         question.IncorrectAnswer1,
         question.IncorrectAnswer2,
         question.IncorrectAnswer3,
-        question.CorrectAnswer
-    };
+        question.CorrectAnswer 
+        };
 
             return answers.OrderBy(a => random.Next()).ToArray();
         }
@@ -163,13 +149,13 @@ namespace Labb3___GUI.ViewModel
             }
         }
         private string _endOfQuizMessage;
-        public string EndOfQuizMessage                                  //Might be useless
-        {                                                               //Might be useless
-            get => _endOfQuizMessage;                                   //Might be useless
-            set                                                         //Might be useless
-            {                                                           //Might be useless
-                _endOfQuizMessage = value;                              //Might be useless
-                RaisePropertyChanged(nameof(EndOfQuizMessage));         //Might be useless
+        public string EndOfQuizMessage                         
+        {                                                      
+            get => _endOfQuizMessage;                          
+            set                                                
+            {                                                  
+                _endOfQuizMessage = value;                     
+                RaisePropertyChanged(nameof(EndOfQuizMessage));
             }
         }
         private bool _isQuizFinished;
@@ -181,7 +167,6 @@ namespace Labb3___GUI.ViewModel
                 if (_isQuizFinished != value)
                 {
                     _isQuizFinished = value;
-                    // Automatically set IsQuizRunning to the opposite value when IsQuizFinished changes
                     IsQuizRunning = !value;
                     RaisePropertyChanged(nameof(IsQuizFinished));
                     IsQuizRunning = !value;
@@ -239,7 +224,6 @@ namespace Labb3___GUI.ViewModel
             timer.Start();
         }
 
-
         private int _correctAnswerCount;
         public int CorrectAnswerCount
         {
@@ -251,15 +235,11 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged(nameof(TotalScore));
             }
         }
-        //
-        // Peta in lite commands här? tex välja svar
-        // Peta in lite commands här? tex välja restarta game
-        // Peta in lite commands här? tex välja 
+
         public DelegateCommand UpdateButtonCommand { get; }
 
         public PlayerViewModel(MainWindowViewModel? mainWindowViewModel)
         {
-            
 
             CurrentQuestion = new Question();
             this.mainWindowViewModel = mainWindowViewModel;
@@ -279,11 +259,9 @@ namespace Labb3___GUI.ViewModel
             AnswerCommand = new DelegateCommand(AnswerSelected);
             StartTimerCommand = new DelegateCommand(StartTimer);
             ResetQuizCommand = new DelegateCommand(ResetQuiz);
-
         }
 
         public string TotalScore => $"{CorrectAnswerCount} of {TotalQuestions} correct!";
-
         private async void AnswerSelected(object? parameter)
         {
             string selectedAnswer = parameter as string;
@@ -300,8 +278,6 @@ namespace Labb3___GUI.ViewModel
                 }
                 else
                 {
-
-                    // await ShowCorrectAnswer();
                     SetButtonColor(selectedAnswer, Brushes.Red);
                     SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green);
                 }
@@ -335,7 +311,6 @@ namespace Labb3___GUI.ViewModel
                 TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
                 RaisePropertyChanged(nameof(TimeRemaining));
                 timer.Start();
-
             }
             else
             {
@@ -368,7 +343,6 @@ namespace Labb3___GUI.ViewModel
 
         private void SetButtonColor(string answer, SolidColorBrush color)
         {
-
             if (answer == _currentAnswers[0]) Option1StatusColor = color;  
             else if (answer == _currentAnswers[1]) Option2StatusColor = color;
             else if (answer == _currentAnswers[2]) Option3StatusColor = color; 

@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Labb3___GUI.Model
 {
     internal class Question
     {
-
         public Question()
         {
             Query = "Default Question Text";

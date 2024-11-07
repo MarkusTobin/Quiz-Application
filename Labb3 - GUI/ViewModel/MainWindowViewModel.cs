@@ -1,26 +1,17 @@
 ﻿using Labb3___GUI.Command;
 using Labb3___GUI.Dialogs;
 using Labb3___GUI.Model;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Xml.Linq;
 using Labb3___GUI.Json;
 
 namespace Labb3___GUI.ViewModel
 {
     internal class MainWindowViewModel : ViewModelBase
     {
-        private ObservableCollection<QuestionPackViewModel> _packs; //json
-        public ObservableCollection<QuestionPackViewModel> Packs { get; set; } = new ObservableCollection<QuestionPackViewModel>(); //
+        private ObservableCollection<QuestionPackViewModel> _packs;
+        public ObservableCollection<QuestionPackViewModel> Packs { get; set; } = new ObservableCollection<QuestionPackViewModel>();
         public ConfigurationViewModel ConfigurationViewModel { get; }
         public PlayerViewModel PlayerViewModel { get; }
         private QuestionPackViewModel? _activePack;
@@ -28,11 +19,10 @@ namespace Labb3___GUI.ViewModel
         public DelegateCommand StartQuizCommand { get; }
         public DelegateCommand SetConfigModeCommand { get; }
         public DelegateCommand SetPlayModeCommand { get; }
-        //new changes-----------------------------------------------------------------------------
-        public DelegateCommand AddPackCommand { get; }    //nytt inlagt
-        public DelegateCommand RemovePackCommand { get; } //nytt inlagt
-        public DelegateCommand EditPackCommand { get; }   //nytt inlagt
-        public DelegateCommand SelectPackCommand { get; } //nytt inlagt
+        public DelegateCommand AddPackCommand { get; } 
+        public DelegateCommand RemovePackCommand { get; } 
+        public DelegateCommand EditPackCommand { get; }
+        public DelegateCommand SelectPackCommand { get; } 
         public DelegateCommand CloseDialogCommand { get; }
         public DelegateCommand ToggleFullScreenCommand { get; set; }
         public DelegateCommand SaveToJsonCommand {  get; set; }
@@ -42,7 +32,6 @@ namespace Labb3___GUI.ViewModel
         private readonly PlayerViewModel _playerViewModel;
         private ObservableCollection<Question> _questions;
 
-       
         public MainWindowViewModel()
         {
             LoadPacksAsync();
@@ -50,16 +39,13 @@ namespace Labb3___GUI.ViewModel
 
             if (Packs == null || Packs.Count == 0)
             {
-
             var defaultPack = new QuestionPack("My Question Pack", Difficulty.Medium, 30);
             var defaultQuestion = new Question("What is 2 + 2?", "4", "3", "5", "6");
             var defaultQuestion2 = new Question("What is 4 + 4?", "8", "3", "5", "6");
             defaultPack.Questions.Add(defaultQuestion);
             defaultPack.Questions.Add(defaultQuestion2);
 
-
             var defaultPackViewModel = new QuestionPackViewModel(defaultPack);
-
             Packs = new ObservableCollection<QuestionPackViewModel> { defaultPackViewModel };
             ActivePack = defaultPackViewModel;
             }
@@ -75,9 +61,6 @@ namespace Labb3___GUI.ViewModel
             }
 
 
-
-
-
             AddPackCommand = new DelegateCommand(AddPack);
             RemovePackCommand = new DelegateCommand(RemovePack, CanRemovePack);
             EditPackCommand = new DelegateCommand(EditPack, CanEditPack);
@@ -85,71 +68,52 @@ namespace Labb3___GUI.ViewModel
             CloseDialogCommand = new DelegateCommand(CloseDialogWindow);
             StartQuizCommand = new DelegateCommand(StartQuiz);
             SetConfigModeCommand = new DelegateCommand(_ => SetConfigMode());
-            SetPlayModeCommand = new DelegateCommand(_ => SetPlayMode());//här?
+            SetPlayModeCommand = new DelegateCommand(_ => SetPlayMode());
             ToggleFullScreenCommand = new DelegateCommand(ToggleFullScreen);
             SaveToJsonCommand = new DelegateCommand(SaveToJson);
             ExitAndSaveCommand = new DelegateCommand(ExitAndSave);
 
             IsConfigMode = true;
-            IsPlayMode = false; // ta bort?
+            IsPlayMode = false;
         }
 
         private async void SaveToJson(object parameter)
         {
             await JsonSaveLoad.SavePacksToJson(this);
         }
-
         private async void LoadPacksAsync()
         {
             await JsonSaveLoad.LoadPacksFromJson(this);
         }
 
-        //json
-        /*private async void ExitProgram(object obj)
-        {
-            var result = MessageBox.Show("Are you sure you want to exit?", "Exit Program",
-                MessageBoxButton.YesNo);
-            if (result == MessageBoxResult.Yes)
-            {
-                await JsonHandler.SavePacksToJson(this);
-                Application.Current.Shutdown();
-            }
-        }*/
-        //gammalt
         private void SelectPack(object selectedPackObj)
         {
             if (selectedPackObj is QuestionPackViewModel selectedPack)
             {
                 ActivePack = selectedPack;
-                //gammalt
-                //mainWindowViewModel.ActivePack = selectedPack;
-              //  SetActivePack(selectedPack.Model);
             }
         }
-        // Assuming you have a method to change the active pack
-        //gammalt
+
         public void SetActivePack(QuestionPack newPack)
         {
-            ActivePack = new QuestionPackViewModel(newPack);  // Ensure this is correctly updating the active pack
+            ActivePack = new QuestionPackViewModel(newPack);
             RaisePropertyChanged(nameof(ActivePack));
-            PlayerViewModel.StartNewQuiz(ActivePack.Questions.ToList());  // Refresh the quiz
+            PlayerViewModel.StartNewQuiz(ActivePack.Questions.ToList()); 
         }
 
         public void CloseDialogWindow(object parameter)
         {
             if (parameter is Window window)
             {
-                window.DialogResult = false; // Or true, depending on whether you want to cancel or save
+                window.DialogResult = false;
                 window.Close();
             }
         }
 
         private void AddPack(object parameter)
         {
-
             var newPack = new QuestionPack("Default name", Difficulty.Medium, 30);
             var newPackViewModel = new QuestionPackViewModel(newPack);
-
 
             var dialog = new CreateNewPackDialog()
             {
@@ -159,7 +123,6 @@ namespace Labb3___GUI.ViewModel
             bool? result = dialog.ShowDialog();
             if (result == true)
             {
-
                 Packs.Add(newPackViewModel);
                 ActivePack = newPackViewModel;
                 RaisePropertyChanged(nameof(Packs));
@@ -216,7 +179,6 @@ namespace Labb3___GUI.ViewModel
                 ConfigurationViewModel.ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
             }
         }
-        //public Window ParentWindow => Application.Current.MainWindow; // is this usefull?
         private readonly MainWindowViewModel? mainWindowViewModel;
         private bool _isPlayMode;
         public bool IsPlayMode
@@ -270,24 +232,23 @@ namespace Labb3___GUI.ViewModel
 
         private void ToggleFullScreen(object parameter)
         {
-            var mainWindow = System.Windows.Application.Current.MainWindow; ; // Get the main window from the application context
+            var mainWindow = System.Windows.Application.Current.MainWindow;
 
             if (mainWindow == null)
             {
                 Debug.WriteLine("Error: MainWindow is not available.");
-                return;  // Exit if no main window is available
+                return; 
             }
 
-            // Toggle between fullscreen and normal mode
             if (mainWindow.WindowState == WindowState.Normal)
             {
                 mainWindow.WindowState = WindowState.Maximized;
-                mainWindow.WindowStyle = WindowStyle.None;  // Remove border for fullscreen
+                mainWindow.WindowStyle = WindowStyle.None; 
             }
             else
             {
                 mainWindow.WindowState = WindowState.Normal;
-                mainWindow.WindowStyle = WindowStyle.SingleBorderWindow;  // Restore window border
+                mainWindow.WindowStyle = WindowStyle.SingleBorderWindow;
             }
         }
         private async void ExitAndSave(object parameter)
