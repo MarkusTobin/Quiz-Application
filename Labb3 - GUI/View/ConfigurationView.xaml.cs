@@ -15,9 +15,7 @@ using System.Windows.Shapes;
 
 namespace Labb3___GUI.View
 {
-    /// <summary>
-    /// Interaction logic for ConfigurationView.xaml
-    /// </summary>
+
     public partial class ConfigurationView : UserControl
     {
         public ConfigurationView()
@@ -25,5 +23,13 @@ namespace Labb3___GUI.View
             InitializeComponent();
         }
 
+        private void textboxQuestion_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+        private void OnAddQuestionButtonClick(object sender, RoutedEventArgs e)
+        {
+            textboxQuestion.Focus();
+        }
     }
 }

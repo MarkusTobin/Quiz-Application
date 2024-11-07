@@ -3,6 +3,8 @@ using Labb3___GUI.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
@@ -16,33 +18,45 @@ namespace Labb3___GUI.ViewModel
 {
     internal class PlayerViewModel : ViewModelBase
     {
-        public bool IsPlayMode => mainWindowViewModel.IsPlayMode;
-        public void StartNewQuiz(IEnumerable<Question> questions)
+        public string QuestionOfTotalQuestion => $"Question {CurrentQuestionNumber} of {TotalQuestions}";
+        private bool _isPlayMode;
+        private string[] _currentAnswers;
+        private readonly Random random = new Random();
+        private QuestionPackViewModel ActivePack;
+        public void StartNewQuiz(List<Question> questions)
         {
-            if (questions == null || !questions.Any())
+
+            //questions gets null
+            
+            ShuffledQuestions = questions.OrderBy(q => Guid.NewGuid()).ToList();
+
+            if (ShuffledQuestions.Any())
+            {
+                TotalQuestions = ShuffledQuestions.Count;
+                CurrentQuestionNumber = 1;
+                CurrentQuestion = ShuffledQuestions.FirstOrDefault();
+                CorrectAnswerCount = 0;
+                TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
+                RaisePropertyChanged(nameof(TimeRemaining));
+                RaisePropertyChanged(nameof(QuestionOfTotalQuestion));
+                timer.Start();
+            }
+            else
             {
                 IsQuizFinished = true;
                 EndOfQuizMessage = "No questions available.";
-                return;
             }
-
-            ShuffledQuestions = questions.OrderBy(q => Guid.NewGuid()).ToList();
-            TotalQuestions = ShuffledQuestions.Count;
-            CurrentQuestionNumber = 1;
-            CurrentQuestion = ShuffledQuestions.FirstOrDefault();
-            CorrectAnswerCount = 0;
-
-            TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
-            timer.Start();
         }
         private readonly MainWindowViewModel? mainWindowViewModel;
         private DispatcherTimer timer;
 
 
         //Fixa commands
+        private Question _currentQuestion;
         public DelegateCommand AnswerCommand { get; }
 
-        public DelegateCommand RestartQuizCommand { get; }
+        public DelegateCommand ResetQuizCommand { get; }
+        public DelegateCommand StartTimerCommand { get; }
 
         private ObservableCollection<string> _currentAnswerOptions;
         public ObservableCollection<string> CurrentAnswerOptions
@@ -55,16 +69,50 @@ namespace Labb3___GUI.ViewModel
             }
         }
         //
-        private Question _currentQuestion; // maybe QuiestionViewmodel instead of Question?
-        public Question CurrentQuestion    // maybe QuiestionViewmodel instead of Question?
+        public Question CurrentQuestion
         {
             get => _currentQuestion;
             set
             {
-                _currentQuestion = value;
-                RaisePropertyChanged(nameof(CurrentQuestion));
+                if (_currentQuestion != value)
+                {
+                    _currentQuestion = value;
+                    RaisePropertyChanged(nameof(CurrentQuestion));
+
+                    if (_currentQuestion != null)
+                    {
+                        _currentAnswers = GetShuffledAnswers(CurrentQuestion);
+                    }
+                    else
+                    {
+                        _currentAnswers = Array.Empty<string>();
+                    }
+
+                    RaisePropertyChanged(nameof(Answer1));
+                    RaisePropertyChanged(nameof(Answer2));
+                    RaisePropertyChanged(nameof(Answer3));
+                    RaisePropertyChanged(nameof(Answer4));
+                }
             }
         }
+
+        private string[] GetShuffledAnswers(Question question)
+        {
+            var answers = new List<string>
+    {
+        question.IncorrectAnswer1,
+        question.IncorrectAnswer2,
+        question.IncorrectAnswer3,
+        question.CorrectAnswer
+    };
+
+            return answers.OrderBy(a => random.Next()).ToArray();
+        }
+
+        public string Answer1 => _currentAnswers?.Length > 0 ? _currentAnswers[0] : string.Empty;
+        public string Answer2 => _currentAnswers?.Length > 1 ? _currentAnswers[1] : string.Empty;
+        public string Answer3 => _currentAnswers?.Length > 2 ? _currentAnswers[2] : string.Empty;
+        public string Answer4 => _currentAnswers?.Length > 3 ? _currentAnswers[3] : string.Empty;
 
         private int _currentQuestionNumber;
         public int CurrentQuestionNumber
@@ -72,7 +120,8 @@ namespace Labb3___GUI.ViewModel
             get => _currentQuestionNumber; set
             {
                 _currentQuestionNumber = value;
-                RaisePropertyChanged(nameof(CurrentQuestionNumber));
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(QuestionOfTotalQuestion));
             }
         }
 
@@ -83,7 +132,8 @@ namespace Labb3___GUI.ViewModel
             set
             {
                 _totalQuestions = value;
-                RaisePropertyChanged(nameof(TotalQuestions));
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(QuestionOfTotalQuestion));
             }
         }
 
@@ -106,17 +156,21 @@ namespace Labb3___GUI.ViewModel
             get => _timeRemaining;
             set
             {
-                RaisePropertyChanged(nameof(_timeRemaining));
+                if (_timeRemaining != value)
+                {
+                    _timeRemaining = value;
+                    RaisePropertyChanged(nameof(TimeRemaining));
+                }
             }
         }
         private string _endOfQuizMessage;
-        public string EndOfQuizMessage
-        {
-            get => _endOfQuizMessage;
-            set
-            {
-                _endOfQuizMessage = value;
-                RaisePropertyChanged(nameof(EndOfQuizMessage));
+        public string EndOfQuizMessage                                  //Might be useless
+        {                                                               //Might be useless
+            get => _endOfQuizMessage;                                   //Might be useless
+            set                                                         //Might be useless
+            {                                                           //Might be useless
+                _endOfQuizMessage = value;                              //Might be useless
+                RaisePropertyChanged(nameof(EndOfQuizMessage));         //Might be useless
             }
         }
         private bool _isQuizFinished;
@@ -125,10 +179,67 @@ namespace Labb3___GUI.ViewModel
             get => _isQuizFinished;
             set
             {
-                _isQuizFinished = value;
-                RaisePropertyChanged(nameof(IsQuizFinished));
+                if (_isQuizFinished != value)
+                {
+                    _isQuizFinished = value;
+                    // Automatically set IsQuizRunning to the opposite value when IsQuizFinished changes
+                    IsQuizRunning = !value;
+                    RaisePropertyChanged(nameof(IsQuizFinished));
+                    IsQuizRunning = !value;
+                }
             }
         }
+        private bool _isStartButtonVisible = true;
+        public bool IsStartButtonVisible
+        {
+            get => _isStartButtonVisible;
+            set
+            {
+                _isStartButtonVisible = value;
+                RaisePropertyChanged(nameof(IsStartButtonVisible));
+            }
+        }
+
+        private bool _isQuizRunning;
+        public bool IsQuizRunning
+        {
+            get => _isQuizRunning;
+            set
+            {
+                _isQuizRunning = value;
+                RaisePropertyChanged(nameof(IsQuizRunning));
+            }
+        }
+
+        private void StartTimer(object? parameter)
+        {
+
+            TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
+
+            IsStartButtonVisible = false;
+            IsQuizRunning = true;
+            RaisePropertyChanged(nameof(TimeRemaining));
+            timer.Start();
+        }
+
+        private void ResetQuiz(object? parameter)
+        {
+            ResetButtonColors();
+            CurrentQuestionNumber = 1;
+            CorrectAnswerCount = 0;
+            IsQuizFinished = false;
+            IsQuizRunning = true;
+            IsStartButtonVisible = false;
+            TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
+
+            ShuffledQuestions = ShuffledQuestions.OrderBy(q => Guid.NewGuid()).ToList();
+            CurrentQuestion = ShuffledQuestions.FirstOrDefault();
+
+
+            RaisePropertyChanged(nameof(ShuffledQuestions));
+            timer.Start();
+        }
+
 
         private int _correctAnswerCount;
         public int CorrectAnswerCount
@@ -138,6 +249,7 @@ namespace Labb3___GUI.ViewModel
             {
                 _correctAnswerCount = value;
                 RaisePropertyChanged(nameof(CorrectAnswerCount));
+                RaisePropertyChanged(nameof(TotalScore));
             }
         }
         //
@@ -148,18 +260,14 @@ namespace Labb3___GUI.ViewModel
 
         public PlayerViewModel(MainWindowViewModel? mainWindowViewModel)
         {
-            this.mainWindowViewModel = mainWindowViewModel;
-            if (mainWindowViewModel?.ActivePack != null && mainWindowViewModel.ActivePack.Questions != null)
-            {
-                ShuffledQuestions = mainWindowViewModel.ActivePack.Questions.OrderBy(q => Guid.NewGuid()).ToList();
-                TotalQuestions = ShuffledQuestions.Count;
-            }
+            
 
-            else
-            {
-                ShuffledQuestions = new List<Question>(); // or handle as needed
-                TotalQuestions = 0; // No questions available
-            }
+            CurrentQuestion = new Question();
+            this.mainWindowViewModel = mainWindowViewModel;
+
+            ShuffledQuestions = mainWindowViewModel.ActivePack.Questions.OrderBy(q => Guid.NewGuid()).ToList();
+            TotalQuestions = ShuffledQuestions.Count;
+
             CurrentQuestionNumber = 1;
             CurrentQuestion = ShuffledQuestions.FirstOrDefault();
             CorrectAnswerCount = 0;
@@ -170,12 +278,16 @@ namespace Labb3___GUI.ViewModel
             timer.Tick += TimerTick;
 
             AnswerCommand = new DelegateCommand(AnswerSelected);
+            StartTimerCommand = new DelegateCommand(StartTimer);
+            ResetQuizCommand = new DelegateCommand(ResetQuiz);
 
         }
 
-        private void AnswerSelected(object? obj)
+        public string TotalScore => $"{CorrectAnswerCount} of {TotalQuestions} correct!";
+
+        private async void AnswerSelected(object? parameter)
         {
-            string selectedAnswer = obj as string;
+            string selectedAnswer = parameter as string;
             if (CurrentQuestion != null && selectedAnswer != null)
             {
 
@@ -190,53 +302,61 @@ namespace Labb3___GUI.ViewModel
                 else
                 {
 
-                    ShowCorrectAnswer();
+                    // await ShowCorrectAnswer();
                     SetButtonColor(selectedAnswer, Brushes.Red);
                     SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green);
                 }
 
-                NextQuestion();
-            }
-        }
-        private void TimerTick(object sender, EventArgs e)
-        {
-            if (TimeRemaining > 0)
-            {
-                timer.Stop();
-                EndOfQuizMessage = "Time is up, guess quicker next time!";
-                ShowCorrectAnswer();
-                NextQuestion();
-            }
-        }
-        public void NextQuestion()
-        {
-            if (CurrentQuestionNumber < TotalQuestions)
-            {
-                CurrentQuestionNumber++;
-                CurrentQuestion = ShuffledQuestions[CurrentQuestionNumber - 1];
-                TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
-                timer.Start();
-            }
-            else
-            {
-                IsQuizFinished = true;
-                timer.Stop();
-                EndOfQuizMessage = $"Quiz finsished! You got {CorrectAnswerCount} out of {TotalQuestions} correct";
+                await Task.Delay(1000);
+                await NextQuestion();
             }
         }
 
-        private void ShowCorrectAnswer()
+        private void TimerTick(object sender, EventArgs e)
         {
-            if (AnswerSelected == ShowCorrectAnswer)
+            Debug.WriteLine($"Time Remaining: {TimeRemaining}");
+            if (TimeRemaining > 0)
             {
-                Thread.Sleep(1000);
-                CorrectAnswerCount++;
-                NextQuestion();
+                TimeRemaining--;
             }
             else
             {
-                Thread.Sleep(1000);
-                NextQuestion();
+                ShowCorrectAnswer();
+                Task.Delay(1000).ContinueWith(t => NextQuestion());
+            }
+        }
+        public async Task NextQuestion()
+        {
+            if (CurrentQuestionNumber < TotalQuestions)
+            {
+                ResetButtonColors();
+                CurrentQuestionNumber++;
+                CurrentQuestion = ShuffledQuestions[CurrentQuestionNumber - 1];
+
+                TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
+                RaisePropertyChanged(nameof(TimeRemaining));
+                timer.Start();
+
+            }
+            else
+            {
+                timer.Stop();
+                IsQuizFinished = true;
+                RaisePropertyChanged(TotalScore);
+            }
+        }
+
+        private async Task ShowCorrectAnswer()
+        {
+            if (AnswerSelected == ShowCorrectAnswer)
+            {
+                SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green);
+                CorrectAnswerCount++;
+            }
+            else
+            {
+                SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green);
+                return;
             }
         }
         private void ResetButtonColors()

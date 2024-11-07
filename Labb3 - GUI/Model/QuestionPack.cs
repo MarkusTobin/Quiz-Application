@@ -13,13 +13,6 @@ namespace Labb3___GUI.Model
         public const int MediumIndex = 1;
         public const int HardIndex = 2;
 
-        // This property is what you will bind to the ComboBox
-    /*    public int DifficultyIndex
-        {
-            get => (int)Difficulty;  // Get the index from the enum
-            set => Difficulty = (Difficulty)value;  // Set the enum based on the index
-        }*/
-
         public QuestionPack() { }
         public QuestionPack(string name, Difficulty difficulty = Difficulty.Medium, int timeLimitInSeconds = 30)
         {

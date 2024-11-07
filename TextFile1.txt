@@ -27,4 +27,34 @@ Qol Fixes
 
 * File -> new question pack ska öppna en dialog med cancel + create
 
-* Selected pack ska visa svårighetsgrad i rutan
+
+*Lägga över massa saker från Questionpackview till playerviewmodel?
+
+
+*task.delay (async wait) istället för thread.sleep vid varje ny fråga i playquizet
+---------
+*jsonclass med 2 methoder (load(deserialise, return list of questionpacks) + save(serialise), anropa från viewmodel?
+
+Savefunktionen kollar om det finns map annars skapa ny (vart?)
+path = @"c:\users\appdata\local\"
+
+public
+ska vara async
+-------------
+
+*När man byter meny från playquizmoden så ska den slutas
+* Startar man quizzet så kör den endast med 2+2 4+4 frågorna
+
+
+
+*kvar för godkänt:
+*randomisa svarsalternativsbuttonsen
+Json
+Full Screen
+Importera frågor via API ( VG-uppgift )
+
+
+
+*Skapas ingen default activepack
+*
+*

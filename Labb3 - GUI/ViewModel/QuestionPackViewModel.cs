@@ -22,12 +22,12 @@ namespace Labb3___GUI.ViewModel
             get => _model.Name;
             set
             {
-                    _model.Name = value;
-                    RaisePropertyChanged();
-                    RaisePropertyChanged(nameof(DisplayText));
+                _model.Name = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(DisplayText));
             }
         }
-        public Difficulty Difficulty 
+        public Difficulty Difficulty
         {
             get => _model.Difficulty;
             set
@@ -37,7 +37,7 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged(nameof(DisplayText));
             }
 
-            }
+        }
         public int DifficultyIndex
         {
             get => (int)_model.Difficulty; // Convert Difficulty enum to int index
@@ -49,13 +49,14 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged(nameof(DisplayText)); // Update DisplayText if it depends on Difficulty
             }
         }
+        private int _timeLimitInSeconds = 30;
         public int TimeLimitInSeconds
         {
             get => _model.TimeLimitInSeconds;
             set
             {
                 _model.TimeLimitInSeconds = value;
-                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(TimeLimitInSeconds));
             }
         }
         public ObservableCollection<Question> Questions { get; }

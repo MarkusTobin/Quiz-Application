@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,53 +18,11 @@ namespace Labb3___GUI.ViewModel
 {
     internal class MainWindowViewModel : ViewModelBase
     {
-        //public Window ParentWindow => Application.Current.MainWindow; // is this usefull?
-        private bool _isPlayMode;
-        public bool IsPlayMode
-        {
-            get => _isPlayMode;
-            set
-            {
-                _isPlayMode = value;
-                RaisePropertyChanged();
-            }
-        }
-        private bool _isConfigMode;
-        public bool IsConfigMode
-        {
-            get => _isConfigMode;
-            set
-            {
-                _isConfigMode = value;
-                RaisePropertyChanged();
-            }
-        }
-        public MainWindowViewModel()
-        {
-            ConfigurationViewModel = new ConfigurationViewModel(this);
-            PlayerViewModel = new PlayerViewModel(this);
-            Packs = new ObservableCollection<QuestionPackViewModel>();
-            ActivePack = new QuestionPackViewModel(new QuestionPack("My Question Pack"));
-            Packs.Add(ActivePack);
 
-            AddPackCommand = new DelegateCommand(AddPack);                          //nytt
-            RemovePackCommand = new DelegateCommand(RemovePack, CanRemovePack);     //nytt
-            EditPackCommand = new DelegateCommand(EditPack, CanEditPack);           //nytt
-            SelectPackCommand = new DelegateCommand(SelectPack);
-
-            CloseDialogCommand = new DelegateCommand(CloseDialogWindow);
-
-            StartQuizCommand = new DelegateCommand(StartQuiz);
-            SetConfigModeCommand = new DelegateCommand(_ => SetConfigMode());
-            SetPlayModeCommand = new DelegateCommand(_ => SetPlayMode());
-
-            IsConfigMode = true; // might not me needed
-            IsPlayMode = false;  // might not me needed
-        }
         public ObservableCollection<QuestionPackViewModel> Packs { get; set; } = new ObservableCollection<QuestionPackViewModel>(); //
         public ConfigurationViewModel ConfigurationViewModel { get; }
         public PlayerViewModel PlayerViewModel { get; }
-
+        private QuestionPackViewModel? _activePack;
         public DelegateCommand StartQuizCommand { get; }
         public DelegateCommand SetConfigModeCommand { get; }
         public DelegateCommand SetPlayModeCommand { get; }
@@ -74,57 +33,105 @@ namespace Labb3___GUI.ViewModel
         public DelegateCommand SelectPackCommand { get; } //nytt inlagt
         public DelegateCommand CloseDialogCommand { get; }
 
+        private readonly PlayerViewModel _playerViewModel;
+        private ObservableCollection<Question> _questions;
+        public MainWindowViewModel()
+        {
+
+            ConfigurationViewModel = new ConfigurationViewModel(this);
+
+            var defaultPack = new QuestionPack("My Question Pack", Difficulty.Medium, 30);
+
+
+            var defaultQuestion = new Question("What is 2 + 2?", "4", "3", "5", "6");
+            var defaultQuestion2 = new Question("What is 4 + 4?", "8", "3", "5", "6");
+            defaultPack.Questions.Add(defaultQuestion);
+            defaultPack.Questions.Add(defaultQuestion2);
+
+
+            var defaultPackViewModel = new QuestionPackViewModel(defaultPack);
+
+            Packs = new ObservableCollection<QuestionPackViewModel> { defaultPackViewModel };
+            ActivePack = defaultPackViewModel;
+
+            PlayerViewModel = new PlayerViewModel(this);
+            if (ActivePack?.Questions != null && ActivePack.Questions.Any())
+            {
+                PlayerViewModel.StartNewQuiz(ActivePack.Questions.ToList());
+            }
+            else
+            {
+                Debug.WriteLine("Error: ActivePack does not contain any questions.");
+            }
+
+
+
+
+
+            AddPackCommand = new DelegateCommand(AddPack);
+            RemovePackCommand = new DelegateCommand(RemovePack, CanRemovePack);
+            EditPackCommand = new DelegateCommand(EditPack, CanEditPack);
+            SelectPackCommand = new DelegateCommand(SelectPack);
+            CloseDialogCommand = new DelegateCommand(CloseDialogWindow);
+            StartQuizCommand = new DelegateCommand(StartQuiz);
+            SetConfigModeCommand = new DelegateCommand(_ => SetConfigMode());
+            SetPlayModeCommand = new DelegateCommand(_ => SetPlayMode());//här?
+
+            IsConfigMode = true;
+            IsPlayMode = false; // ta bort?
+        }
+
+        //gammalt
         private void SelectPack(object selectedPackObj)
         {
             if (selectedPackObj is QuestionPackViewModel selectedPack)
             {
                 ActivePack = selectedPack;
-                // Additional logic could be added here to update UI or load questions if needed
+                //gammalt
+                //mainWindowViewModel.ActivePack = selectedPack;
+              //  SetActivePack(selectedPack.Model);
             }
         }
+        // Assuming you have a method to change the active pack
+        //gammalt
+        public void SetActivePack(QuestionPack newPack)
+        {
+            ActivePack = new QuestionPackViewModel(newPack);  // Ensure this is correctly updating the active pack
+            RaisePropertyChanged(nameof(ActivePack));
+            PlayerViewModel.StartNewQuiz(ActivePack.Questions.ToList());  // Refresh the quiz
+        }
+
         public void CloseDialogWindow(object parameter)
         {
-            var window = (Window)parameter;
-            window.Close();
+            if (parameter is Window window)
+            {
+                window.DialogResult = false; // Or true, depending on whether you want to cancel or save
+                window.Close();
+            }
         }
 
         private void AddPack(object parameter)
         {
-            var dialog = new CreateNewPackDialog();
-            var newPackViewModel = new QuestionPackViewModel(new QuestionPack()); // Initialize with an empty model
-            dialog.DataContext = newPackViewModel;
 
-            // Show the dialog and check if the dialog result is true
-            bool? result = dialog.ShowDialog();
-            if (result == true) // Only add the new pack if the dialog was confirmed
+            var newPack = new QuestionPack("Default name", Difficulty.Medium, 30);
+            var newPackViewModel = new QuestionPackViewModel(newPack);
+
+
+            var dialog = new CreateNewPackDialog()
             {
-                // Only add to the Packs collection if the dialog was accepted
+                DataContext = newPackViewModel
+            };
+
+            bool? result = dialog.ShowDialog();
+            if (result == true)
+            {
+
                 Packs.Add(newPackViewModel);
-                ActivePack = newPackViewModel; // Optionally select the new pack
+                ActivePack = newPackViewModel;
                 RaisePropertyChanged(nameof(Packs));
             }
         }
 
-        /*       private void CreateNewPackDialog(object parameter)
-               {
-                   var newPack = new QuestionPack(); // Use default constructor
-                   var viewModel = new QuestionPackViewModel(newPack);
-                   var dialog = new CreateNewPackDialog
-                   {
-                       DataContext = viewModel
-                   };
-
-                   bool? result = dialog.ShowDialog();
-
-                   if (result == true)
-                   {
-                       var createdPack = viewModel.Model;
-                       var createdPackViewModel = new QuestionPackViewModel(createdPack); 
-                       Packs.Add(createdPackViewModel);
-                       RaisePropertyChanged(nameof(Packs));
-                   }
-               }
-       */
         private void RemovePack(object parameter)
         {
             if (ActivePack != null)
@@ -162,10 +169,7 @@ namespace Labb3___GUI.ViewModel
         {
             return ActivePack != null;
         }
-        //new changes-----------------------------------------------------------------------------
-       
 
-        private QuestionPackViewModel? _activePack;
         public QuestionPackViewModel? ActivePack
         {
             get => _activePack;
@@ -176,13 +180,39 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged();
                 ConfigurationViewModel.RaisePropertyChanged(nameof(ConfigurationViewModel.ActivePack));
                 ConfigurationViewModel.ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
-                RaisePropertyChanged(nameof(ActivePack)); 
-                RaisePropertyChanged(nameof(ActivePack.Name));
-               // ((DelegateCommand)RemovePackCommand).RaiseCanExecuteChanged();                //Kolla om det ska ha (Delgatecommand) eller ej //nytt också
-               // ((DelegateCommand)EditPackCommand).RaiseCanExecuteChanged(); //Kolla om det ska ha (Delgatecommand) eller ej //nytt också
             }
         }
-        private void StartQuiz(object obj)
+        //public Window ParentWindow => Application.Current.MainWindow; // is this usefull?
+        private readonly MainWindowViewModel? mainWindowViewModel;
+        private bool _isPlayMode;
+        public bool IsPlayMode
+        {
+            get => _isPlayMode;
+            set
+            {
+                _isPlayMode = value;
+                RaisePropertyChanged();
+                if (_isPlayMode)
+                {
+                    StartGame();
+                }
+            }
+        }
+        private void StartGame()
+        {
+            PlayerViewModel.StartNewQuiz(ActivePack.Questions.ToList());
+        }
+        private bool _isConfigMode;
+        public bool IsConfigMode
+        {
+            get => _isConfigMode;
+            set
+            {
+                _isConfigMode = value;
+                RaisePropertyChanged();
+            }
+        }
+        private void StartQuiz(object parameter)
         {
             if (ActivePack == null || !ActivePack.Questions.Any())
             {
@@ -190,7 +220,7 @@ namespace Labb3___GUI.ViewModel
             }
             IsPlayMode = true;
             IsConfigMode = false;
-            PlayerViewModel.StartNewQuiz(ActivePack.Questions);
+            PlayerViewModel.StartNewQuiz(ActivePack.Questions.ToList());
         }
         private void SetConfigMode()
         {
@@ -203,5 +233,12 @@ namespace Labb3___GUI.ViewModel
             IsPlayMode = true;
             IsConfigMode = false;
         }
+        //gammalt
+        /*public void AddQuestion(Question newQuestion)
+        {
+            ActivePack.Questions.Add(newQuestion);  // Add new question
+            PlayerViewModel.StartNewQuiz(ActivePack.Questions);  // Refresh the quiz with the updated list
+        }*/
+
     }
 }
