@@ -1,5 +1,4 @@
-﻿using Labb3___GUI.Model;
-using Labb3___GUI.ViewModel;
+﻿using Labb3___GUI.ViewModel;
 using System.Windows;
 
 
