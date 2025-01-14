@@ -13,7 +13,7 @@ namespace Labb3___GUI.ViewModel
 
         }
         public QuestionPack Model => _model;
-        public string DisplayText => $"{Name} ({Difficulty})"; //nytt
+        public string DisplayText => $"{Name} ({Difficulty})";
         public string Name
         {
             get => _model.Name;
@@ -37,13 +37,13 @@ namespace Labb3___GUI.ViewModel
         }
         public int DifficultyIndex
         {
-            get => (int)_model.Difficulty; // Convert Difficulty enum to int index
+            get => (int)_model.Difficulty;
             set
             {
-                _model.Difficulty = (Difficulty)value; // Convert index back to Difficulty enum
+                _model.Difficulty = (Difficulty)value;
                 RaisePropertyChanged();
-                RaisePropertyChanged(nameof(Difficulty)); // Notify that Difficulty also changed
-                RaisePropertyChanged(nameof(DisplayText)); // Update DisplayText if it depends on Difficulty
+                RaisePropertyChanged(nameof(Difficulty));
+                RaisePropertyChanged(nameof(DisplayText));
             }
         }
         public int TimeLimitInSeconds

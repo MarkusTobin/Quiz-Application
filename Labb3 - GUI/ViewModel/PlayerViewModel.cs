@@ -288,7 +288,8 @@ namespace Labb3___GUI.ViewModel
 
         private void TimerTick(object sender, EventArgs e)
         {
-            Debug.WriteLine($"Time Remaining: {TimeRemaining}");
+            //fixa
+            //Debug.WriteLine($"Time Remaining: {TimeRemaining}");
             if (TimeRemaining > 0)
             {
                 TimeRemaining--;

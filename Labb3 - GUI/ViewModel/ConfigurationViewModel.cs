@@ -2,6 +2,7 @@
 using Labb3___GUI.Dialogs;
 using Labb3___GUI.Model;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows;
 
 namespace Labb3___GUI.ViewModel
@@ -60,6 +61,7 @@ namespace Labb3___GUI.ViewModel
             {
                 questions = value;
                 RaisePropertyChanged(nameof(Questions));
+                Debug.WriteLine("Questions updated:", questions.Count);
             }
         }
 

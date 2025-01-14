@@ -4,13 +4,15 @@ using Labb3___GUI.Model;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
-using Labb3___GUI.Json;
+using Labb3___GUI.MongoDB;
+using MongoDB.Driver;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+
 
 namespace Labb3___GUI.ViewModel
 {
     internal class MainWindowViewModel : ViewModelBase
     {
-        private ObservableCollection<QuestionPackViewModel> _packs;
         public ObservableCollection<QuestionPackViewModel> Packs { get; set; } = new ObservableCollection<QuestionPackViewModel>();
         public ConfigurationViewModel ConfigurationViewModel { get; }
         public PlayerViewModel PlayerViewModel { get; }
@@ -19,32 +21,35 @@ namespace Labb3___GUI.ViewModel
         public DelegateCommand StartQuizCommand { get; }
         public DelegateCommand SetConfigModeCommand { get; }
         public DelegateCommand SetPlayModeCommand { get; }
-        public DelegateCommand AddPackCommand { get; } 
-        public DelegateCommand RemovePackCommand { get; } 
+        public DelegateCommand AddPackCommand { get; }
+        public DelegateCommand RemovePackCommand { get; }
         public DelegateCommand EditPackCommand { get; }
-        public DelegateCommand SelectPackCommand { get; } 
+        public DelegateCommand SelectPackCommand { get; }
         public DelegateCommand CloseDialogCommand { get; }
         public DelegateCommand ToggleFullScreenCommand { get; set; }
-        public DelegateCommand SaveToJsonCommand {  get; set; }
+       // public DelegateCommand SaveToJsonCommand { get; set; } = null;
         public DelegateCommand ExitAndSaveCommand { get; }
-
 
         public MainWindowViewModel()
         {
-            LoadPacksAsync();
             ConfigurationViewModel = new ConfigurationViewModel(this);
+            Task.Run(async () => await LoadFromMongoDB()).Wait();
+
+            Debug.WriteLine(Packs.Count);
+
 
             if (Packs == null || Packs.Count == 0)
             {
-            var defaultPack = new QuestionPack("My Question Pack", Difficulty.Medium, 30);
-            var defaultQuestion = new Question("What is 2 + 2?", "4", "3", "5", "6");
-            var defaultQuestion2 = new Question("What is 4 + 4?", "8", "3", "5", "6");
-            defaultPack.Questions.Add(defaultQuestion);
-            defaultPack.Questions.Add(defaultQuestion2);
 
-            var defaultPackViewModel = new QuestionPackViewModel(defaultPack);
-            Packs = new ObservableCollection<QuestionPackViewModel> { defaultPackViewModel };
-            ActivePack = defaultPackViewModel;
+                var defaultPack = new QuestionPack("My Question Pack", Difficulty.Medium, 30);
+                var defaultQuestion = new Question("What is 2 + 2?", "4", "3", "5", "6");
+                var defaultQuestion2 = new Question("What is 4 + 4?", "8", "3", "5", "6");
+                defaultPack.Questions.Add(defaultQuestion);
+                defaultPack.Questions.Add(defaultQuestion2);
+
+                var defaultPackViewModel = new QuestionPackViewModel(defaultPack);
+                Packs = new ObservableCollection<QuestionPackViewModel> { defaultPackViewModel };
+                ActivePack = defaultPackViewModel;
             }
 
             PlayerViewModel = new PlayerViewModel(this);
@@ -57,7 +62,6 @@ namespace Labb3___GUI.ViewModel
                 Debug.WriteLine("Error: ActivePack does not contain any questions.");
             }
 
-
             AddPackCommand = new DelegateCommand(AddPack);
             RemovePackCommand = new DelegateCommand(RemovePack, CanRemovePack);
             EditPackCommand = new DelegateCommand(EditPack, CanEditPack);
@@ -67,20 +71,44 @@ namespace Labb3___GUI.ViewModel
             SetConfigModeCommand = new DelegateCommand(_ => SetConfigMode());
             SetPlayModeCommand = new DelegateCommand(_ => SetPlayMode());
             ToggleFullScreenCommand = new DelegateCommand(ToggleFullScreen);
-            SaveToJsonCommand = new DelegateCommand(SaveToJson);
             ExitAndSaveCommand = new DelegateCommand(ExitAndSave);
 
             IsConfigMode = true;
             IsPlayMode = false;
         }
 
-        private async void SaveToJson(object parameter)
+
+        private async Task SaveToMongoDB(List<QuestionPack> Packs)
         {
-            await JsonSaveLoad.SavePacksToJson(this);
+            foreach (var pack in Packs)
+            {
+                Debug.WriteLine($"Saving pack: {pack.Name}, Questions count: {pack.Questions.Count}");
+            }
+            var client = new MongoClient("mongodb://localhost:27017");
+            var database = client.GetDatabase("MarkusTobin");
+
+            var mongoDBService = new MongoDBService(database);
+            await mongoDBService.SaveToMongoDBService(Packs);
+
         }
-        private async void LoadPacksAsync()
+
+        private async Task LoadFromMongoDB()
         {
-            await JsonSaveLoad.LoadPacksFromJson(this);
+            var client = new MongoClient("mongodb://localhost:27017");
+            var database = client.GetDatabase("MarkusTobin");
+            var mongoDBService = new MongoDBService(database);
+            List<QuestionPack> questionPacks = await mongoDBService.LoadFromMongoDBService();
+            foreach (var pack in questionPacks)
+            {
+                Packs.Add(new QuestionPackViewModel(pack));
+            }
+            Debug.WriteLine($"{Packs.Count} QuestionPacks loaded.");
+
+            if (Packs.Any())
+            {
+                ActivePack = Packs.First();
+
+            }
         }
 
         private void SelectPack(object selectedPackObj)
@@ -95,7 +123,7 @@ namespace Labb3___GUI.ViewModel
         {
             ActivePack = new QuestionPackViewModel(newPack);
             RaisePropertyChanged(nameof(ActivePack));
-            PlayerViewModel.StartNewQuiz(ActivePack.Questions.ToList()); 
+            PlayerViewModel.StartNewQuiz(ActivePack.Questions.ToList());
         }
 
         public void CloseDialogWindow(object parameter)
@@ -234,13 +262,13 @@ namespace Labb3___GUI.ViewModel
             if (mainWindow == null)
             {
                 Debug.WriteLine("Error: MainWindow is not available.");
-                return; 
+                return;
             }
 
             if (mainWindow.WindowState == WindowState.Normal)
             {
                 mainWindow.WindowState = WindowState.Maximized;
-                mainWindow.WindowStyle = WindowStyle.None; 
+                mainWindow.WindowStyle = WindowStyle.None;
             }
             else
             {
@@ -250,21 +278,20 @@ namespace Labb3___GUI.ViewModel
         }
         private async void ExitAndSave(object parameter)
         {
-
             var result = System.Windows.MessageBox.Show(
                 "You will save all Questionpacks on exit. Do you want to continue?",
                 "Confirm Exit",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question
             );
-                RaisePropertyChanged(nameof(Packs));
+            RaisePropertyChanged(nameof(Packs));
 
             if (result == MessageBoxResult.Yes)
             {
-                await JsonSaveLoad.SavePacksToJson(this);
+                var questionPacks = Packs.Select(p => p.Model).ToList();
+                await SaveToMongoDB(questionPacks);
                 System.Windows.Application.Current.Shutdown();
             }
         }
-
     }
 }

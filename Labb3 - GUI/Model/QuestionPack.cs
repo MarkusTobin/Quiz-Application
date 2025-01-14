@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
 
 namespace Labb3___GUI.Model
 {
@@ -11,7 +13,6 @@ namespace Labb3___GUI.Model
 
         public QuestionPack() { }
 
-        [JsonConstructor]
         public QuestionPack(string name, Difficulty difficulty = Difficulty.Medium, int timeLimitInSeconds = 30, List<Question> questions = null)
         {
             Name = name;
@@ -19,11 +20,19 @@ namespace Labb3___GUI.Model
             TimeLimitInSeconds = timeLimitInSeconds;
             Questions = questions ?? new List<Question>();
         }
+        [BsonId]
+        public ObjectId Id { get; set; }
 
-
+        [BsonElement("Name")]
         public string Name { get; set; }
+
+        [BsonElement("Difficulty")]
         public Difficulty Difficulty { get; set; }
+
+        [BsonElement("TimeLimitInSeconds")]
         public int TimeLimitInSeconds { get; set; }
+
+        [BsonElement("Questions")]
         public List<Question> Questions { get; set; }
     }
 }
