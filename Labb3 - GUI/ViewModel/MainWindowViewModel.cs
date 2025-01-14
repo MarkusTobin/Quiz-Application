@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Windows;
 using Labb3___GUI.MongoDB;
 using MongoDB.Driver;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 
 namespace Labb3___GUI.ViewModel
@@ -27,7 +26,6 @@ namespace Labb3___GUI.ViewModel
         public DelegateCommand SelectPackCommand { get; }
         public DelegateCommand CloseDialogCommand { get; }
         public DelegateCommand ToggleFullScreenCommand { get; set; }
-       // public DelegateCommand SaveToJsonCommand { get; set; } = null;
         public DelegateCommand ExitAndSaveCommand { get; }
 
         public MainWindowViewModel()
@@ -35,6 +33,8 @@ namespace Labb3___GUI.ViewModel
             ConfigurationViewModel = new ConfigurationViewModel(this);
             Task.Run(async () => await LoadFromMongoDB()).Wait();
 
+            Debug.WriteLine(Packs.Count);
+            Debug.WriteLine(Packs.Count);
             Debug.WriteLine(Packs.Count);
 
 
@@ -78,17 +78,18 @@ namespace Labb3___GUI.ViewModel
         }
 
 
-        private async Task SaveToMongoDB(List<QuestionPack> Packs)
+        private async Task SaveToMongoDB(List<QuestionPack> questionPacks)
         {
-            foreach (var pack in Packs)
+            foreach (var pack in questionPacks)
             {
                 Debug.WriteLine($"Saving pack: {pack.Name}, Questions count: {pack.Questions.Count}");
             }
+
             var client = new MongoClient("mongodb://localhost:27017");
             var database = client.GetDatabase("MarkusTobin");
 
             var mongoDBService = new MongoDBService(database);
-            await mongoDBService.SaveToMongoDBService(Packs);
+            await mongoDBService.SaveToMongoDBService(questionPacks);
 
         }
 

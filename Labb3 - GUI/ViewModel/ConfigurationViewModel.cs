@@ -4,6 +4,7 @@ using Labb3___GUI.Model;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
+using MongoDB.Driver;
 
 namespace Labb3___GUI.ViewModel
 {
@@ -83,7 +84,7 @@ namespace Labb3___GUI.ViewModel
         {
             VisibilityMode = Visibility.Visible;
 
-            var newQuestion = new Question("", "", "", "", "");
+            var newQuestion = new Question("Default", "1", "2", "3", "4");
             ActivePack?.Questions.Add(newQuestion);
             ActiveQuestion = newQuestion;
             RemoveButtonCommand.RaiseCanExecuteChanged();

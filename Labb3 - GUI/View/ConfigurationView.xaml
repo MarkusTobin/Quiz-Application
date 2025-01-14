@@ -108,28 +108,28 @@
             <TextBox x:Name="textboxCorrectAnswer"
                      Margin="10,0"
                      TabIndex="1"
-                     Text="{Binding ActiveQuestion.CorrectAnswer, Mode=TwoWay}"/>
+                     Text="{Binding ActiveQuestion.CorrectAnswer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Label Content="Incorrect answer1"
                    Margin="10,0"/>
             <TextBox x:Name="textboxIncorrectAnswer1"
                      Margin="10,0"
                      TabIndex="2"
-                     Text="{Binding ActiveQuestion.IncorrectAnswer1, Mode=TwoWay}" />
+                     Text="{Binding ActiveQuestion.IncorrectAnswer1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <Label Content="Incorrect answer2"
                    Margin="10,0"/>
             <TextBox x:Name="textboxIncorrectAnswer2"
                      Margin="10,0"
                      TabIndex="3"
-                     Text="{Binding ActiveQuestion.IncorrectAnswer2, Mode=TwoWay}"/>
+                     Text="{Binding ActiveQuestion.IncorrectAnswer2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Label Content="Incorrect answer3"
                    Margin="10,0"/>
             <TextBox x:Name="textboxIncorrectAnswer3"
                      Margin="10,0"
                      TabIndex="4"
-                     Text="{Binding ActiveQuestion.IncorrectAnswer3, Mode=TwoWay}"/>
+                     Text="{Binding ActiveQuestion.IncorrectAnswer3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
     </Grid>
 </UserControl>

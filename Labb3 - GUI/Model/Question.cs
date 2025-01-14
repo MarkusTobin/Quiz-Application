@@ -26,9 +26,6 @@ namespace Labb3___GUI.Model
             IncorrectAnswer3 = incorrectAnswer3;
         }
 
-     //  [BsonId] // Mark as identifier for MongoDB if required
-     //   public ObjectId Id { get; set; }
-
        [BsonElement("Query")]
         public string Query { get; set; }
 
