@@ -1,8 +1,14 @@
 ﻿<Window x:Class="Labb3___GUI.Dialogs.CreateNewPackDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="New Question Pack" Height="250" Width="220" ResizeMode="NoResize"
+        xmlns:viewmodel="clr-namespace:Labb3___GUI.ViewModel"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=viewmodel:QuestionPackViewModel}"
+        Title="New Question Pack" Height="275" Width="220" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
+    
     <Grid Margin="10">
 
         <Grid.RowDefinitions>
@@ -19,6 +25,12 @@
 
             <Label Content="Pack Name:" FontWeight="Bold"/>
             <TextBox Text="{Binding Name}"/>
+
+            <TextBlock Text="Category:" FontWeight="Bold"/>
+            <ComboBox
+                      ItemsSource="{Binding Categories}"
+                      SelectedItem="{Binding SelectedCategory}"
+                      />
 
             <TextBlock Text="Difficulty:" FontWeight="Bold"/>
             <ComboBox SelectedIndex="{Binding DifficultyIndex, Mode=TwoWay}">

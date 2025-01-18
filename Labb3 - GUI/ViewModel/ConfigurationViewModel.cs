@@ -19,6 +19,7 @@ namespace Labb3___GUI.ViewModel
         {
             if (ActivePack != null)
             {
+
                 var dialog = new PackOptionsDialog();
                 var dialogViewModel = new QuestionPack
                 {
@@ -43,8 +44,8 @@ namespace Labb3___GUI.ViewModel
         {
             this.mainWindowViewModel = mainWindowViewModel;
             VisibilityMode = Visibility.Hidden;
-
             IsEnabled = true;
+
             AddButtonCommand = new DelegateCommand(AddButton);
             RemoveButtonCommand = new DelegateCommand(RemoveButton, CanRemoveQuestion);
             EditPackCommand = new DelegateCommand(EditPack, CanEditPack);

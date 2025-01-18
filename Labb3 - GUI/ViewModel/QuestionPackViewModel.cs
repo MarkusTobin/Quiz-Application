@@ -7,8 +7,11 @@ namespace Labb3___GUI.ViewModel
     internal class QuestionPackViewModel : ViewModelBase
     {
         private readonly QuestionPack _model;
+        private readonly CategoryViewModel _categoryViewModel;
+
         public QuestionPackViewModel(QuestionPack model)
         {
+            _categoryViewModel = new CategoryViewModel();
             _model = model;
             Questions = new ObservableCollection<Question>(model.Questions ?? new List<Question>());
 
@@ -69,5 +72,15 @@ namespace Labb3___GUI.ViewModel
             }
         }
         public ObservableCollection<Question> Questions { get; }
+        public ObservableCollection<string> Categories => _categoryViewModel.Categories;
+        public string SelectedCategory
+        {
+            get => _categoryViewModel.SelectedCategory;
+            set
+            {
+                _categoryViewModel.SelectedCategory = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }

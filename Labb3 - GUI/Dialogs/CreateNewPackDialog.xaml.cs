@@ -10,7 +10,7 @@ namespace Labb3___GUI.Dialogs
         public CreateNewPackDialog()
         {
             InitializeComponent();
-            
+
         }
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {

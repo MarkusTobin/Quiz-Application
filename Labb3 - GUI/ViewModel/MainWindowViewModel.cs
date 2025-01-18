@@ -15,6 +15,7 @@ namespace Labb3___GUI.ViewModel
         public ObservableCollection<QuestionPackViewModel> Packs { get; set; } = new ObservableCollection<QuestionPackViewModel>();
         public ConfigurationViewModel ConfigurationViewModel { get; }
         public PlayerViewModel PlayerViewModel { get; }
+        public CategoryViewModel CategoryViewModel { get; }
         private QuestionPackViewModel? _activePack;
 
         public DelegateCommand StartQuizCommand { get; }
@@ -33,9 +34,7 @@ namespace Labb3___GUI.ViewModel
             ConfigurationViewModel = new ConfigurationViewModel(this);
             Task.Run(async () => await LoadFromMongoDB()).Wait();
 
-            Debug.WriteLine(Packs.Count);
-            Debug.WriteLine(Packs.Count);
-            Debug.WriteLine(Packs.Count);
+            CategoryViewModel = new CategoryViewModel();
 
 
             if (Packs == null || Packs.Count == 0)
@@ -234,6 +233,7 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged();
             }
         }
+
         private void StartQuiz(object parameter)
         {
             if (ActivePack == null || !ActivePack.Questions.Any())
