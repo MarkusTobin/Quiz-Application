@@ -28,19 +28,20 @@ namespace Labb3___GUI.ViewModel
         public DelegateCommand CloseDialogCommand { get; }
         public DelegateCommand ToggleFullScreenCommand { get; set; }
         public DelegateCommand ExitAndSaveCommand { get; }
+        public DelegateCommand OpenEditCategoriesCommand { get; }
 
         public MainWindowViewModel()
         {
             ConfigurationViewModel = new ConfigurationViewModel(this);
             Task.Run(async () => await LoadFromMongoDB()).Wait();
-
             CategoryViewModel = new CategoryViewModel();
+
 
 
             if (Packs == null || Packs.Count == 0)
             {
 
-                var defaultPack = new QuestionPack("My Question Pack", Difficulty.Medium, 30);
+                var defaultPack = new QuestionPack("My Question Pack", Difficulty.Medium, 30, null, "No Category Set");
                 var defaultQuestion = new Question("What is 2 + 2?", "4", "3", "5", "6");
                 var defaultQuestion2 = new Question("What is 4 + 4?", "8", "3", "5", "6");
                 defaultPack.Questions.Add(defaultQuestion);
@@ -71,13 +72,22 @@ namespace Labb3___GUI.ViewModel
             SetPlayModeCommand = new DelegateCommand(_ => SetPlayMode());
             ToggleFullScreenCommand = new DelegateCommand(ToggleFullScreen);
             ExitAndSaveCommand = new DelegateCommand(ExitAndSave);
+            OpenEditCategoriesCommand = new DelegateCommand(_ => OpenEditCategories());
 
             IsConfigMode = true;
             IsPlayMode = false;
         }
 
+        private void OpenEditCategories()
+        {
+            var editCategoriesDialog = new EditCategoriesDialog
+            {
+                DataContext = new EditCategoriesViewModel(CategoryViewModel.Categories)
+            };
+            editCategoriesDialog.ShowDialog();
+        }
 
-        private async Task SaveToMongoDB(List<QuestionPack> questionPacks)
+        private async Task SaveToMongoDB(List<QuestionPack> questionPacks, List<string> categories)
         {
             foreach (var pack in questionPacks)
             {
@@ -88,8 +98,7 @@ namespace Labb3___GUI.ViewModel
             var database = client.GetDatabase("MarkusTobin");
 
             var mongoDBService = new MongoDBService(database);
-            await mongoDBService.SaveToMongoDBService(questionPacks);
-
+            await mongoDBService.SaveToMongoDBService(questionPacks, categories);
         }
 
         private async Task LoadFromMongoDB()
@@ -97,7 +106,7 @@ namespace Labb3___GUI.ViewModel
             var client = new MongoClient("mongodb://localhost:27017");
             var database = client.GetDatabase("MarkusTobin");
             var mongoDBService = new MongoDBService(database);
-            List<QuestionPack> questionPacks = await mongoDBService.LoadFromMongoDBService();
+            var (questionPacks, categories) = await mongoDBService.LoadFromMongoDBService();
             foreach (var pack in questionPacks)
             {
                 Packs.Add(new QuestionPackViewModel(pack));
@@ -107,7 +116,6 @@ namespace Labb3___GUI.ViewModel
             if (Packs.Any())
             {
                 ActivePack = Packs.First();
-
             }
         }
 
@@ -140,12 +148,16 @@ namespace Labb3___GUI.ViewModel
             var newPack = new QuestionPack("Default name", Difficulty.Medium, 30);
             var newPackViewModel = new QuestionPackViewModel(newPack);
 
-            var dialog = new CreateNewPackDialog()
+            var createNewPackDialog = new CreateNewPackDialog()
             {
                 DataContext = newPackViewModel
             };
 
-            bool? result = dialog.ShowDialog();
+
+            newPackViewModel.OpenEditCategoriesCommand = OpenEditCategoriesCommand;
+            newPackViewModel.Categories = CategoryViewModel.Categories;
+
+            bool? result = createNewPackDialog.ShowDialog();
             if (result == true)
             {
                 Packs.Add(newPackViewModel);
@@ -289,10 +301,12 @@ namespace Labb3___GUI.ViewModel
 
             if (result == MessageBoxResult.Yes)
             {
-                var questionPacks = Packs.Select(p => p.Model).ToList();
-                await SaveToMongoDB(questionPacks);
+                var questionPacks = Packs.Select(p => p.QuestionPack).ToList();
+                var categories = CategoryViewModel.Categories.ToList();
+                await SaveToMongoDB(questionPacks, categories);
                 System.Windows.Application.Current.Shutdown();
             }
         }
+
     }
 }

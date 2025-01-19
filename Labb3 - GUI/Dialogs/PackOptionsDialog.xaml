@@ -21,6 +21,12 @@
             <Label Content="Pack Name:" FontWeight="Bold"/>
             <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
 
+            <TextBlock Text="Category:" FontWeight="Bold"/>
+            <ComboBox
+                      ItemsSource="{Binding Categories}"
+                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                      />
+
             <TextBlock Text="Difficulty:" FontWeight="Bold"/>
             <ComboBox SelectedIndex="{Binding DifficultyIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ComboBoxItem Content="Easy" Tag="0"/>

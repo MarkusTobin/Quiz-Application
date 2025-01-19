@@ -5,10 +5,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=viewmodel:QuestionPackViewModel}"
-        Title="New Question Pack" Height="275" Width="220" ResizeMode="NoResize"
+        Title="New Question Pack" Height="300" Width="250" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
-    
+
     <Grid Margin="10">
 
         <Grid.RowDefinitions>
@@ -26,11 +25,13 @@
             <Label Content="Pack Name:" FontWeight="Bold"/>
             <TextBox Text="{Binding Name}"/>
 
-            <TextBlock Text="Category:" FontWeight="Bold"/>
-            <ComboBox
-                      ItemsSource="{Binding Categories}"
-                      SelectedItem="{Binding SelectedCategory}"
-                      />
+            <StackPanel>
+                <TextBlock Text="Category:" FontWeight="Bold"/>
+                <ComboBox
+                           ItemsSource="{Binding Categories}"
+                           SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
+                <Button Content="Edit" Command="{Binding OpenEditCategoriesCommand}" Width="203"/>
+            </StackPanel>
 
             <TextBlock Text="Difficulty:" FontWeight="Bold"/>
             <ComboBox SelectedIndex="{Binding DifficultyIndex, Mode=TwoWay}">
@@ -51,5 +52,6 @@
             <Button Content="Cancel" Margin="5,0,35,0" Click="CancelButton_Click" />
             <Button Content="Create" Margin="5,0,35,0" Click="CreateButton_Click" />
         </StackPanel>
+        
     </Grid>
 </Window>

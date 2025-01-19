@@ -14,10 +14,6 @@ namespace Labb3___GUI.Dialogs
         }
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
-            var packViewModel = (QuestionPackViewModel)this.DataContext;
-
-            var newPack = new QuestionPack("Default name", Difficulty.Medium, 30);
-
             DialogResult = true;
             Close();
         }

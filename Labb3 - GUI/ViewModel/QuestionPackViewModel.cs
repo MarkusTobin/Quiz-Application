@@ -1,4 +1,5 @@
-﻿using Labb3___GUI.Model;
+﻿using Labb3___GUI.Command;
+using Labb3___GUI.Model;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
@@ -6,46 +7,49 @@ namespace Labb3___GUI.ViewModel
 {
     internal class QuestionPackViewModel : ViewModelBase
     {
-        private readonly QuestionPack _model;
+        private readonly QuestionPack _questionPack;
         private readonly CategoryViewModel _categoryViewModel;
 
-        public QuestionPackViewModel(QuestionPack model)
+        public ObservableCollection<Question> Questions { get; }
+        public ObservableCollection<string> Categories { get; set; }
+        public DelegateCommand OpenEditCategoriesCommand { get; set; }
+
+        public QuestionPackViewModel(QuestionPack questionPack)
         {
             _categoryViewModel = new CategoryViewModel();
-            _model = model;
-            Questions = new ObservableCollection<Question>(model.Questions ?? new List<Question>());
+            _questionPack = questionPack;
+            Questions = new ObservableCollection<Question>(questionPack.Questions ?? new List<Question>());
 
             Questions.CollectionChanged += OnQuestionsChanged;
-
         }
 
         private void OnQuestionsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            _model.Questions.Clear();
+            _questionPack.Questions.Clear();
             foreach (var question in Questions)
             {
-                _model.Questions.Add(question);
+                _questionPack.Questions.Add(question);
             }
         }
 
-        public QuestionPack Model => _model;
+        public QuestionPack QuestionPack => _questionPack;
         public string DisplayText => $"{Name} ({Difficulty})";
         public string Name
         {
-            get => _model.Name;
+            get => _questionPack.Name;
             set
             {
-                _model.Name = value;
+                _questionPack.Name = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(DisplayText));
             }
         }
         public Difficulty Difficulty
         {
-            get => _model.Difficulty;
+            get => _questionPack.Difficulty;
             set
             {
-                _model.Difficulty = value;
+                _questionPack.Difficulty = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(DisplayText));
             }
@@ -53,10 +57,10 @@ namespace Labb3___GUI.ViewModel
         }
         public int DifficultyIndex
         {
-            get => (int)_model.Difficulty;
+            get => (int)_questionPack.Difficulty;
             set
             {
-                _model.Difficulty = (Difficulty)value;
+                _questionPack.Difficulty = (Difficulty)value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Difficulty));
                 RaisePropertyChanged(nameof(DisplayText));
@@ -64,21 +68,19 @@ namespace Labb3___GUI.ViewModel
         }
         public int TimeLimitInSeconds
         {
-            get => _model.TimeLimitInSeconds;
+            get => _questionPack.TimeLimitInSeconds;
             set
             {
-                _model.TimeLimitInSeconds = value;
+                _questionPack.TimeLimitInSeconds = value;
                 RaisePropertyChanged(nameof(TimeLimitInSeconds));
             }
         }
-        public ObservableCollection<Question> Questions { get; }
-        public ObservableCollection<string> Categories => _categoryViewModel.Categories;
         public string SelectedCategory
         {
-            get => _categoryViewModel.SelectedCategory;
+            get => _questionPack.Category;
             set
             {
-                _categoryViewModel.SelectedCategory = value;
+                _questionPack.Category = value;
                 RaisePropertyChanged();
             }
         }

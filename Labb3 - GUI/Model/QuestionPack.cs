@@ -13,12 +13,13 @@ namespace Labb3___GUI.Model
 
         public QuestionPack() { }
 
-        public QuestionPack(string name, Difficulty difficulty = Difficulty.Medium, int timeLimitInSeconds = 30, List<Question> questions = null)
+        public QuestionPack(string name, Difficulty difficulty = Difficulty.Medium, int timeLimitInSeconds = 30, List<Question> questions = null, string category = "Not Declared")
         {
             Name = name;
             Difficulty = difficulty;
             TimeLimitInSeconds = timeLimitInSeconds;
             Questions = questions ?? new List<Question>();
+            Category = category;
         }
         [BsonId]
         public ObjectId Id { get; set; }
@@ -34,5 +35,8 @@ namespace Labb3___GUI.Model
 
         [BsonElement("Questions")]
         public List<Question> Questions { get; set; }
+
+        [BsonElement("Category")]
+        public string Category { get; set; }
     }
 }

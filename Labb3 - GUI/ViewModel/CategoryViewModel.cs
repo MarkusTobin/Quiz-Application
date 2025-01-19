@@ -1,13 +1,6 @@
-﻿using Labb3___GUI.Model;
-using Labb3___GUI.MongoDB;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Labb3___GUI.ViewModel
 {
@@ -23,6 +16,7 @@ namespace Labb3___GUI.ViewModel
             {
                 _categories = value;
                 RaisePropertyChanged();
+                if (_categories != null && _categories.Count>0) { SelectedCategory = _categories[0]; }
             }
         }
 
@@ -39,7 +33,12 @@ namespace Labb3___GUI.ViewModel
         {
            Task.Run(() => LoadCategories());
         }
-       
+        public CategoryViewModel(ObservableCollection<string> categories)
+        {
+            Categories = categories;
+            Task.Run(() => LoadCategories());
+        }
+
         public async Task LoadCategories()
         {
             var client = new MongoClient("mongodb://localhost:27017");
@@ -52,9 +51,9 @@ namespace Labb3___GUI.ViewModel
             {
                 var defaultCategories = new List<BsonDocument> 
                 {
-                    new BsonDocument { { "Name", "Science" } },
-                    new BsonDocument { { "Name", "Math" } },
                     new BsonDocument { { "Name", "Other" } },
+                    new BsonDocument { { "Name", "Math" } },
+                    new BsonDocument { { "Name", "Science" } },
                 };
                 await collection.InsertManyAsync(defaultCategories);
                 categoriesFromDB = await collection.Find(new BsonDocument()).ToListAsync();

@@ -13,24 +13,42 @@ namespace Labb3___GUI.MongoDB
         }
 
         public IMongoCollection<QuestionPack> GetQuestionPackCollection() => _database.GetCollection<QuestionPack>("QuestionPacks");
+        public IMongoCollection<Category> GetCategoriesCollection() => _database.GetCollection<Category>("Categories");
 
-        public async Task SaveToMongoDBService(List<QuestionPack> questionPacks)
+        public async Task SaveToMongoDBService(List<QuestionPack> questionPacks, List<string> categories)
         {
-
             var questionPackCollection = GetQuestionPackCollection();
+            var categoryCollection = GetCategoriesCollection();
 
             await questionPackCollection.DeleteManyAsync(_ => true);
-            if (questionPacks.Count == 0)
+            await categoryCollection.DeleteManyAsync(_ => true);
+
+            if (questionPacks.Count > 0)
             {
-                return;
+                await questionPackCollection.InsertManyAsync(questionPacks);
             }
-            await questionPackCollection.InsertManyAsync(questionPacks);
+
+            if (categories.Count > 0)
+            {
+                var categoryDocuments = categories.Select(c => new Category { Name = c }).ToList();
+                await categoryCollection.InsertManyAsync(categoryDocuments);
+            }
         }
 
-        public async Task<List<QuestionPack>> LoadFromMongoDBService()
+        public async Task<(List<QuestionPack>, List<string>)> LoadFromMongoDBService()
         {
             var questionPackCollection = GetQuestionPackCollection();
-            return await questionPackCollection.Find(_ => true).ToListAsync();
+            var categoryCollection = GetCategoriesCollection();
+
+            var questionPacksTask = questionPackCollection.Find(_ => true).ToListAsync();
+            var categoriesTask = categoryCollection.Find(_ => true).ToListAsync();
+
+            await Task.WhenAll(questionPacksTask, categoriesTask);
+
+            var questionPacks = await questionPacksTask;
+            var categories = await categoriesTask;
+
+            return (questionPacks, categories.Select(c => c.Name).ToList());
         }
     }
 }
