@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="New Question Pack" Height="300" Width="250" ResizeMode="NoResize"
+        Title="New Question Pack" Height="300" Width="245" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
 
     <Grid Margin="10">
@@ -30,7 +30,7 @@
                 <ComboBox
                            ItemsSource="{Binding Categories}"
                            SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
-                <Button Content="Edit" Command="{Binding OpenEditCategoriesCommand}" Width="203"/>
+                <Button Content="Edit" Command="{Binding OpenEditCategoriesCommand}"/>
             </StackPanel>
 
             <TextBlock Text="Difficulty:" FontWeight="Bold"/>
@@ -49,8 +49,8 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="15" Width="Auto">
-            <Button Content="Cancel" Margin="5,0,35,0" Click="CancelButton_Click" />
             <Button Content="Create" Margin="5,0,35,0" Click="CreateButton_Click" />
+            <Button Content="Cancel" Margin="5,0,35,0" Click="CancelButton_Click" />
         </StackPanel>
         
     </Grid>

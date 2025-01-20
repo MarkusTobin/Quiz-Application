@@ -24,7 +24,7 @@
             <TextBlock Text="Category:" FontWeight="Bold"/>
             <ComboBox
                       ItemsSource="{Binding Categories}"
-                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       />
 
             <TextBlock Text="Difficulty:" FontWeight="Bold"/>

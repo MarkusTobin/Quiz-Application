@@ -9,9 +9,27 @@ namespace Labb3___GUI.ViewModel
     {
         private readonly QuestionPack _questionPack;
         private readonly CategoryViewModel _categoryViewModel;
+        private ObservableCollection<string> _categories;
 
         public ObservableCollection<Question> Questions { get; }
-        public ObservableCollection<string> Categories { get; set; }
+        public ObservableCollection<string> Categories
+        {
+            get => _categories;
+            set
+            {
+                _categories = value;
+                RaisePropertyChanged();
+                if (_categories != null && _categories.Count > 0)
+                {
+                    if (SelectedCategory != null)
+                    {
+                        return;
+                    }
+                    else
+                    SelectedCategory = _categories[0];
+                }
+            }
+        }
         public DelegateCommand OpenEditCategoriesCommand { get; set; }
 
         public QuestionPackViewModel(QuestionPack questionPack)

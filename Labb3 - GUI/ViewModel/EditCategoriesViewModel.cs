@@ -49,10 +49,11 @@ namespace Labb3___GUI.ViewModel
             if (!string.IsNullOrWhiteSpace(NewCategory) && !Categories.Contains(NewCategory))
             {
                 Categories.Add(NewCategory);
-                NewCategory = string.Empty;
+                SelectedCategory = NewCategory;
                 RaisePropertyChanged(nameof(NewCategory));
                 AddCategoryCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged(nameof(Categories));
+                RaisePropertyChanged(nameof(SelectedCategory));
             }
         }
         private bool CanAddCategory() => !string.IsNullOrWhiteSpace(NewCategory) && !Categories.Contains(NewCategory);

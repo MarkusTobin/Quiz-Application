@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Edit Categories" Height="300" Width="400" ResizeMode="NoResize"
+        Title="Edit Categories" Height="300" Width="325" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -21,7 +21,7 @@
         <ListBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" Grid.Row="1" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" Margin="0,10,0,0">
-            <Button Content="Remove Selected" Command="{Binding RemoveCategoryCommand}" CommandParameter="{Binding SelectedCategory}" />
+            <Button Content="Remove Category" Command="{Binding RemoveCategoryCommand}" CommandParameter="{Binding SelectedCategory}" />
             <Button Content="Close" Margin="10,0,0,0" Click="CloseButton_Click" />
         </StackPanel>
     </Grid>

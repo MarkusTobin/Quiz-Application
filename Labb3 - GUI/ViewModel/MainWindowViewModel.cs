@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Windows;
 using Labb3___GUI.MongoDB;
 using MongoDB.Driver;
+using System.Linq;
+using MongoDB.Driver.Linq;
 
 
 namespace Labb3___GUI.ViewModel
@@ -84,7 +86,14 @@ namespace Labb3___GUI.ViewModel
             {
                 DataContext = new EditCategoriesViewModel(CategoryViewModel.Categories)
             };
-            editCategoriesDialog.ShowDialog();
+            bool? result = editCategoriesDialog.ShowDialog();
+            if (result == true)
+            {
+              if (CategoryViewModel.Categories.Any())
+                {
+                    CategoryViewModel.SelectedCategory = CategoryViewModel.Categories.Last();
+                }  
+            }
         }
 
         private async Task SaveToMongoDB(List<QuestionPack> questionPacks, List<string> categories)
@@ -148,11 +157,17 @@ namespace Labb3___GUI.ViewModel
             var newPack = new QuestionPack("Default name", Difficulty.Medium, 30);
             var newPackViewModel = new QuestionPackViewModel(newPack);
 
+            newPackViewModel.Categories = CategoryViewModel.Categories;
+            newPackViewModel.SelectedCategory = CategoryViewModel.SelectedCategory;
+            //if (newPackViewModel.Categories?.Any() == true)
+            //{
+            //    newPackViewModel.SelectedCategory = newPackViewModel.Categories[0];
+            //}
+
             var createNewPackDialog = new CreateNewPackDialog()
             {
                 DataContext = newPackViewModel
             };
-
 
             newPackViewModel.OpenEditCategoriesCommand = OpenEditCategoriesCommand;
             newPackViewModel.Categories = CategoryViewModel.Categories;
@@ -185,15 +200,27 @@ namespace Labb3___GUI.ViewModel
         {
             if (ActivePack != null)
             {
+                if (ActivePack != null && ActivePack.SelectedCategory == null || !CategoryViewModel.Categories.Contains(ActivePack.SelectedCategory))
+                {
+                    ActivePack.SelectedCategory = CategoryViewModel.Categories.FirstOrDefault() ?? string.Empty;
+                }
+                ActivePack.Categories = CategoryViewModel.Categories;
+
+                if (ActivePack.SelectedCategory == null || !CategoryViewModel.Categories.Contains(ActivePack.SelectedCategory))
+                {
+                    ActivePack.SelectedCategory = CategoryViewModel.Categories.FirstOrDefault() ?? string.Empty;
+                }
+
                 var dialog = new PackOptionsDialog
                 {
                     DataContext = ActivePack
                 };
-
                 bool? result = dialog.ShowDialog();
 
                 if (result == true)
                 {
+                    ActivePack.QuestionPack.Category = ActivePack.SelectedCategory;
+
                     RaisePropertyChanged(nameof(ActivePack));
                 }
             }
