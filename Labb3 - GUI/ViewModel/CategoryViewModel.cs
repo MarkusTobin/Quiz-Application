@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace Labb3___GUI.ViewModel
 {
@@ -16,7 +17,7 @@ namespace Labb3___GUI.ViewModel
             {
                 _categories = value;
                 RaisePropertyChanged();
-                if (_categories != null && _categories.Count>0) { SelectedCategory = _categories[0]; }
+                if (_categories != null && _categories.Count > 0 && SelectedCategory == null) { SelectedCategory = _categories[0]; }
             }
         }
 
@@ -31,7 +32,7 @@ namespace Labb3___GUI.ViewModel
         }
         public CategoryViewModel()
         {
-           Task.Run(() => LoadCategories());
+            Task.Run(() => LoadCategories());
         }
         public CategoryViewModel(ObservableCollection<string> categories)
         {
@@ -45,25 +46,25 @@ namespace Labb3___GUI.ViewModel
             var database = client.GetDatabase("MarkusTobin");
             var collection = database.GetCollection<BsonDocument>("Categories");
 
-            var categoriesFromDB = await collection.Find(new BsonDocument()).ToListAsync();  
-
-            if (categoriesFromDB.Count == 0)
-            {
-                var defaultCategories = new List<BsonDocument> 
-                {
-                    new BsonDocument { { "Name", "Other" } },
-                    new BsonDocument { { "Name", "Math" } },
-                    new BsonDocument { { "Name", "Science" } },
-                };
-                await collection.InsertManyAsync(defaultCategories);
-                categoriesFromDB = await collection.Find(new BsonDocument()).ToListAsync();
-            }
+            var categoriesFromDB = await collection.Find(new BsonDocument()).ToListAsync();
 
             Categories = new ObservableCollection<string>();
 
-            foreach (var category in categoriesFromDB)
+            if (categoriesFromDB.Count == 0)
             {
-                Categories.Add(category["Name"].AsString);
+                Categories = new ObservableCollection<string>
+                {
+                    "Science",
+                    "Math",
+                    "Other"
+                };
+            }
+            else
+            {
+                foreach (var category in categoriesFromDB)
+                {
+                    Categories.Add(category["Name"].AsString);
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ using Labb3___GUI.MongoDB;
 using MongoDB.Driver;
 using System.Linq;
 using MongoDB.Driver.Linq;
+using System.ComponentModel;
 
 
 namespace Labb3___GUI.ViewModel
@@ -37,8 +38,6 @@ namespace Labb3___GUI.ViewModel
             ConfigurationViewModel = new ConfigurationViewModel(this);
             Task.Run(async () => await LoadFromMongoDB()).Wait();
             CategoryViewModel = new CategoryViewModel();
-
-
 
             if (Packs == null || Packs.Count == 0)
             {
@@ -86,14 +85,7 @@ namespace Labb3___GUI.ViewModel
             {
                 DataContext = new EditCategoriesViewModel(CategoryViewModel.Categories)
             };
-            bool? result = editCategoriesDialog.ShowDialog();
-            if (result == true)
-            {
-              if (CategoryViewModel.Categories.Any())
-                {
-                    CategoryViewModel.SelectedCategory = CategoryViewModel.Categories.Last();
-                }  
-            }
+            editCategoriesDialog.ShowDialog();
         }
 
         private async Task SaveToMongoDB(List<QuestionPack> questionPacks, List<string> categories)
@@ -159,10 +151,6 @@ namespace Labb3___GUI.ViewModel
 
             newPackViewModel.Categories = CategoryViewModel.Categories;
             newPackViewModel.SelectedCategory = CategoryViewModel.SelectedCategory;
-            //if (newPackViewModel.Categories?.Any() == true)
-            //{
-            //    newPackViewModel.SelectedCategory = newPackViewModel.Categories[0];
-            //}
 
             var createNewPackDialog = new CreateNewPackDialog()
             {
@@ -200,11 +188,8 @@ namespace Labb3___GUI.ViewModel
         {
             if (ActivePack != null)
             {
-                if (ActivePack != null && ActivePack.SelectedCategory == null || !CategoryViewModel.Categories.Contains(ActivePack.SelectedCategory))
-                {
-                    ActivePack.SelectedCategory = CategoryViewModel.Categories.FirstOrDefault() ?? string.Empty;
-                }
                 ActivePack.Categories = CategoryViewModel.Categories;
+                ActivePack.OpenEditCategoriesCommand = OpenEditCategoriesCommand;
 
                 if (ActivePack.SelectedCategory == null || !CategoryViewModel.Categories.Contains(ActivePack.SelectedCategory))
                 {
@@ -236,7 +221,6 @@ namespace Labb3___GUI.ViewModel
             get => _activePack;
             set
             {
-
                 _activePack = value;
                 RaisePropertyChanged();
                 ConfigurationViewModel.RaisePropertyChanged(nameof(ConfigurationViewModel.ActivePack));
@@ -316,24 +300,29 @@ namespace Labb3___GUI.ViewModel
                 mainWindow.WindowStyle = WindowStyle.SingleBorderWindow;
             }
         }
-        private async void ExitAndSave(object parameter)
+        bool isExitAndSaveRunning = false;
+        private async void ExitAndSave(object? parameter)
         {
+            if (isExitAndSaveRunning)
+            {
+                return;
+            }
+
             var result = System.Windows.MessageBox.Show(
-                "You will save all Questionpacks on exit. Do you want to continue?",
+                "You will save all Questionpacks and Categories on exit. Do you want to continue?",
                 "Confirm Exit",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question
             );
-            RaisePropertyChanged(nameof(Packs));
 
             if (result == MessageBoxResult.Yes)
             {
+                isExitAndSaveRunning = true;
                 var questionPacks = Packs.Select(p => p.QuestionPack).ToList();
                 var categories = CategoryViewModel.Categories.ToList();
                 await SaveToMongoDB(questionPacks, categories);
                 System.Windows.Application.Current.Shutdown();
             }
         }
-
     }
 }

@@ -29,7 +29,7 @@
                 <TextBlock Text="Category:" FontWeight="Bold"/>
                 <ComboBox
                            ItemsSource="{Binding Categories}"
-                           SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
+                           SelectedItem="{Binding SelectedCategory}" />
                 <Button Content="Edit" Command="{Binding OpenEditCategoriesCommand}"/>
             </StackPanel>
 

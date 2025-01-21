@@ -34,7 +34,7 @@ namespace Labb3___GUI.ViewModel
             }
         }
 
-        public DelegateCommand AddCategoryCommand { get; }
+        public DelegateCommand AddCategoryCommand { set; get; }
         public DelegateCommand RemoveCategoryCommand { get; }
 
         public EditCategoriesViewModel(ObservableCollection<string> categories)
@@ -48,6 +48,7 @@ namespace Labb3___GUI.ViewModel
         {
             if (!string.IsNullOrWhiteSpace(NewCategory) && !Categories.Contains(NewCategory))
             {
+                //rensa lite här kanske
                 Categories.Add(NewCategory);
                 SelectedCategory = NewCategory;
                 RaisePropertyChanged(nameof(NewCategory));
