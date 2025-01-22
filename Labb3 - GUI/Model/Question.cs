@@ -51,10 +51,10 @@ namespace Labb3___GUI.Model
             IncorrectAnswer3
         };
 
-            return options.OrderBy(x => Guid.NewGuid()).ToList(); // Randomize order
+            return options.OrderBy(x => Guid.NewGuid()).ToList();
         }
         
-        public ObservableCollection<string> AnswerOptions { get; }  //ta bort alla AnswerOptions?
+        public ObservableCollection<string> AnswerOptions { get; }
         public ObservableCollection<Question> Questions { get; } = new ObservableCollection<Question>();
 
     }

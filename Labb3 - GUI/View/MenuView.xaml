@@ -37,7 +37,8 @@
                 <Separator/>
                 <MenuItem Header="_Import Question Pack"
                           InputGestureText="Ctrl+I"
-                          Icon="{fa:Icon cloudArrowDown}"/>
+                          Icon="{fa:Icon cloudArrowDown}"
+                          IsEnabled="False"/>
 
                 <Separator/>
                 <MenuItem Header="Save and E_xit"

@@ -90,14 +90,8 @@ namespace Labb3___GUI.ViewModel
 
         private async Task SaveToMongoDB(List<QuestionPack> questionPacks, List<string> categories)
         {
-            foreach (var pack in questionPacks)
-            {
-                Debug.WriteLine($"Saving pack: {pack.Name}, Questions count: {pack.Questions.Count}");
-            }
-
             var client = new MongoClient("mongodb://localhost:27017");
             var database = client.GetDatabase("MarkusTobin");
-
             var mongoDBService = new MongoDBService(database);
             await mongoDBService.SaveToMongoDBService(questionPacks, categories);
         }
@@ -108,12 +102,11 @@ namespace Labb3___GUI.ViewModel
             var database = client.GetDatabase("MarkusTobin");
             var mongoDBService = new MongoDBService(database);
             var (questionPacks, categories) = await mongoDBService.LoadFromMongoDBService();
+
             foreach (var pack in questionPacks)
             {
                 Packs.Add(new QuestionPackViewModel(pack));
             }
-            Debug.WriteLine($"{Packs.Count} QuestionPacks loaded.");
-
             if (Packs.Any())
             {
                 ActivePack = Packs.First();
@@ -205,7 +198,6 @@ namespace Labb3___GUI.ViewModel
                 if (result == true)
                 {
                     ActivePack.QuestionPack.Category = ActivePack.SelectedCategory;
-
                     RaisePropertyChanged(nameof(ActivePack));
                 }
             }
@@ -227,7 +219,6 @@ namespace Labb3___GUI.ViewModel
                 ConfigurationViewModel.ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
             }
         }
-        private readonly MainWindowViewModel? mainWindowViewModel;
         private bool _isPlayMode;
         public bool IsPlayMode
         {
@@ -283,12 +274,6 @@ namespace Labb3___GUI.ViewModel
         {
             var mainWindow = System.Windows.Application.Current.MainWindow;
 
-            if (mainWindow == null)
-            {
-                Debug.WriteLine("Error: MainWindow is not available.");
-                return;
-            }
-
             if (mainWindow.WindowState == WindowState.Normal)
             {
                 mainWindow.WindowState = WindowState.Maximized;
@@ -300,14 +285,8 @@ namespace Labb3___GUI.ViewModel
                 mainWindow.WindowStyle = WindowStyle.SingleBorderWindow;
             }
         }
-        bool isExitAndSaveRunning = false;
         private async void ExitAndSave(object? parameter)
         {
-            if (isExitAndSaveRunning)
-            {
-                return;
-            }
-
             var result = System.Windows.MessageBox.Show(
                 "You will save all Questionpacks and Categories on exit. Do you want to continue?",
                 "Confirm Exit",
@@ -317,7 +296,6 @@ namespace Labb3___GUI.ViewModel
 
             if (result == MessageBoxResult.Yes)
             {
-                isExitAndSaveRunning = true;
                 var questionPacks = Packs.Select(p => p.QuestionPack).ToList();
                 var categories = CategoryViewModel.Categories.ToList();
                 await SaveToMongoDB(questionPacks, categories);

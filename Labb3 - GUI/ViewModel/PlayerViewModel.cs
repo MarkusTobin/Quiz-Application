@@ -1,6 +1,7 @@
 ﻿using Labb3___GUI.Command;
 using Labb3___GUI.Model;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -11,7 +12,11 @@ namespace Labb3___GUI.ViewModel
     {
         public string QuestionOfTotalQuestion => $"Question {CurrentQuestionNumber} of {TotalQuestions}";
         private string[] _currentAnswers;
-        private readonly Random random = new Random();
+        private readonly Random _random = new Random();
+        private readonly MainWindowViewModel? _mainWindowViewModel;
+        private DispatcherTimer _timer;
+        private Question _currentQuestion;
+
         public void StartNewQuiz(List<Question> questions)
         {
             ShuffledQuestions = questions.OrderBy(q => Guid.NewGuid()).ToList();
@@ -22,10 +27,10 @@ namespace Labb3___GUI.ViewModel
                 CurrentQuestionNumber = 1;
                 CurrentQuestion = ShuffledQuestions.FirstOrDefault();
                 CorrectAnswerCount = 0;
-                TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
+                TimeRemaining = _mainWindowViewModel.ActivePack.TimeLimitInSeconds;
                 RaisePropertyChanged(nameof(TimeRemaining));
                 RaisePropertyChanged(nameof(QuestionOfTotalQuestion));
-                timer.Start();
+                _timer.Start();
             }
             else
             {
@@ -33,13 +38,7 @@ namespace Labb3___GUI.ViewModel
                 EndOfQuizMessage = "No questions available.";
             }
         }
-        private readonly MainWindowViewModel? mainWindowViewModel;
-        private DispatcherTimer timer;
-
-
-        private Question _currentQuestion;
         public DelegateCommand AnswerCommand { get; }
-
         public DelegateCommand ResetQuizCommand { get; }
         public DelegateCommand StartTimerCommand { get; }
 
@@ -90,7 +89,7 @@ namespace Labb3___GUI.ViewModel
         question.CorrectAnswer 
         };
 
-            return answers.OrderBy(a => random.Next()).ToArray();
+            return answers.OrderBy(a => _random.Next()).ToArray();
         }
 
         public string Answer1 => _currentAnswers?.Length > 0 ? _currentAnswers[0] : string.Empty;
@@ -197,12 +196,12 @@ namespace Labb3___GUI.ViewModel
         private void StartTimer(object? parameter)
         {
 
-            TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
+            TimeRemaining = _mainWindowViewModel.ActivePack.TimeLimitInSeconds;
 
             IsStartButtonVisible = false;
             IsQuizRunning = true;
             RaisePropertyChanged(nameof(TimeRemaining));
-            timer.Start();
+            _timer.Start();
         }
 
         private void ResetQuiz(object? parameter)
@@ -213,14 +212,14 @@ namespace Labb3___GUI.ViewModel
             IsQuizFinished = false;
             IsQuizRunning = true;
             IsStartButtonVisible = false;
-            TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
+            TimeRemaining = _mainWindowViewModel.ActivePack.TimeLimitInSeconds;
 
             ShuffledQuestions = ShuffledQuestions.OrderBy(q => Guid.NewGuid()).ToList();
             CurrentQuestion = ShuffledQuestions.FirstOrDefault();
 
 
             RaisePropertyChanged(nameof(ShuffledQuestions));
-            timer.Start();
+            _timer.Start();
         }
 
         private int _correctAnswerCount;
@@ -241,7 +240,7 @@ namespace Labb3___GUI.ViewModel
         {
 
             CurrentQuestion = new Question();
-            this.mainWindowViewModel = mainWindowViewModel;
+            this._mainWindowViewModel = mainWindowViewModel;
 
             ShuffledQuestions = mainWindowViewModel.ActivePack.Questions.OrderBy(q => Guid.NewGuid()).ToList();
             TotalQuestions = ShuffledQuestions.Count;
@@ -251,9 +250,9 @@ namespace Labb3___GUI.ViewModel
             CorrectAnswerCount = 0;
 
             TimeRemaining = mainWindowViewModel.ActivePack?.TimeLimitInSeconds ?? 0;
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += TimerTick;
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(1);
+            _timer.Tick += TimerTick;
 
             AnswerCommand = new DelegateCommand(AnswerSelected);
             StartTimerCommand = new DelegateCommand(StartTimer);
@@ -288,16 +287,18 @@ namespace Labb3___GUI.ViewModel
 
         private void TimerTick(object sender, EventArgs e)
         {
-            //fixa
-            //Debug.WriteLine($"Time Remaining: {TimeRemaining}");
-            if (TimeRemaining > 0)
+            if (_mainWindowViewModel.IsPlayMode && !IsStartButtonVisible)
             {
-                TimeRemaining--;
-            }
-            else
-            {
-                ShowCorrectAnswer();
-                Task.Delay(1000).ContinueWith(t => NextQuestion());
+                Debug.WriteLine($"Time Remaining: {TimeRemaining}");
+                if (TimeRemaining > 0)
+                {
+                    TimeRemaining--;
+                }
+                else
+                {
+                    ShowCorrectAnswer();
+                    Task.Delay(1000).ContinueWith(t => NextQuestion());
+                }
             }
         }
         public async Task NextQuestion()
@@ -308,13 +309,13 @@ namespace Labb3___GUI.ViewModel
                 CurrentQuestionNumber++;
                 CurrentQuestion = ShuffledQuestions[CurrentQuestionNumber - 1];
 
-                TimeRemaining = mainWindowViewModel.ActivePack.TimeLimitInSeconds;
+                TimeRemaining = _mainWindowViewModel.ActivePack.TimeLimitInSeconds;
                 RaisePropertyChanged(nameof(TimeRemaining));
-                timer.Start();
+                _timer.Start();
             }
             else
             {
-                timer.Stop();
+                _timer.Stop();
                 IsQuizFinished = true;
                 RaisePropertyChanged(TotalScore);
             }

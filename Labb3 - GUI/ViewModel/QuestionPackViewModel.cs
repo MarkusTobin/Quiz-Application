@@ -90,7 +90,7 @@ namespace Labb3___GUI.ViewModel
             set
             {
                 _questionPack.TimeLimitInSeconds = value;
-                RaisePropertyChanged(nameof(TimeLimitInSeconds));
+                RaisePropertyChanged();
             }
         }
         public string SelectedCategory

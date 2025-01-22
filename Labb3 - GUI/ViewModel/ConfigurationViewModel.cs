@@ -10,7 +10,7 @@ namespace Labb3___GUI.ViewModel
 {
     internal class ConfigurationViewModel : ViewModelBase
     {
-        private readonly MainWindowViewModel? mainWindowViewModel;
+        private readonly MainWindowViewModel? _mainWindowViewModel;
         public DelegateCommand AddButtonCommand { get; }
         public DelegateCommand RemoveButtonCommand { get; }
 
@@ -42,7 +42,7 @@ namespace Labb3___GUI.ViewModel
 
         public ConfigurationViewModel(MainWindowViewModel mainWindowViewModel)
         {
-            this.mainWindowViewModel = mainWindowViewModel;
+            this._mainWindowViewModel = mainWindowViewModel;
             VisibilityMode = Visibility.Hidden;
             IsEnabled = true;
 
@@ -53,17 +53,17 @@ namespace Labb3___GUI.ViewModel
             ActivePack?.Questions.Add(new Question("Question abc", "a", "b", "c", "d"));
             ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
         }
-        private ObservableCollection<Question> questions;
-        public QuestionPackViewModel? ActivePack { get => mainWindowViewModel.ActivePack; }
+        private ObservableCollection<Question> _questions;
+        public QuestionPackViewModel? ActivePack { get => _mainWindowViewModel.ActivePack; }
 
         public ObservableCollection<Question> Questions
         {
-            get => questions;
+            get => _questions;
             set
             {
-                questions = value;
+                _questions = value;
                 RaisePropertyChanged(nameof(Questions));
-                Debug.WriteLine("Questions updated:", questions.Count);
+                Debug.WriteLine("Questions updated:", _questions.Count);
             }
         }
 
@@ -99,7 +99,6 @@ namespace Labb3___GUI.ViewModel
         }
 
         private bool CanRemoveQuestion(object? parameter) => ActiveQuestion != null;
-
 
         private Visibility _visibility;
         public Visibility VisibilityMode { get => _visibility; set { _visibility = value; RaisePropertyChanged(); } }

@@ -11,9 +11,18 @@ namespace Labb3___GUI.MongoDB
         {
             _database = database;
         }
-
+        public const string connectionString = "mongodb://localhost:27017";
+        public const string databaseName = "MarkusTobin";
         public IMongoCollection<QuestionPack> GetQuestionPackCollection() => _database.GetCollection<QuestionPack>("QuestionPacks");
         public IMongoCollection<Category> GetCategoriesCollection() => _database.GetCollection<Category>("Categories");
+
+        public IMongoCollection<PlayerResult> GetGameSessionCollection() => _database.GetCollection<PlayerResult>("PlayerResult");
+
+        public async Task SaveGameSession(PlayerResult playerResult)
+        {
+            var playerResultCollection = GetGameSessionCollection();
+            await playerResultCollection.InsertOneAsync(playerResult);
+        }
 
         public async Task SaveToMongoDBService(List<QuestionPack> questionPacks, List<string> categories)
         {
