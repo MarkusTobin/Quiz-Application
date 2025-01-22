@@ -1,10 +1,13 @@
 ﻿using Labb3___GUI.Command;
 using Labb3___GUI.Model;
+using MongoDB.Bson;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Windows.Media;
 using System.Windows.Threading;
+using MongoDB.Driver;
+using Labb3___GUI.MongoDB;
 
 namespace Labb3___GUI.ViewModel
 {
@@ -14,11 +17,104 @@ namespace Labb3___GUI.ViewModel
         private string[] _currentAnswers;
         private readonly Random _random = new Random();
         private readonly MainWindowViewModel? _mainWindowViewModel;
-        private DispatcherTimer _timer;
+        private DispatcherTimer _questionTimer;
         private Question _currentQuestion;
+        //Nytt för vg delen___________
+        private readonly MongoDBService _mongoDBService;
 
-        public void StartNewQuiz(List<Question> questions)
+        private TimeSpan _sessionTimer;
+        public TimeSpan SessionTimer
         {
+            get => _sessionTimer;
+            set
+            {
+                _sessionTimer = value;
+                RaisePropertyChanged();
+            }
+        }
+        private string _playerName;
+        public string PlayerName
+        {
+            get => _playerName;
+            set
+            {
+                _playerName = value;
+                RaisePropertyChanged();
+            }
+        }
+        private ObjectId _questionPackId;
+        public ObjectId QuestionPackId
+        {
+            get => _questionPackId;
+            set
+            {
+                _questionPackId = value;
+                RaisePropertyChanged(nameof(QuestionPackId));
+            }
+        }
+
+        private string _questionPackName;
+        public string QuestionPackName
+        {
+            get => _questionPackName;
+            set
+            {
+                _questionPackName = value;
+                RaisePropertyChanged(nameof(QuestionPackName));
+            }
+        }
+
+        private List<PlayerAnswer> _answers;
+        public List<PlayerAnswer> Answers
+        {
+            get => _answers;
+            set
+            {
+                _answers = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private ObservableCollection<PlayerResult> _top5PlayerResult;
+        public ObservableCollection<PlayerResult> Top5PlayerResult
+        {
+            get => _top5PlayerResult;
+            set
+            {
+                _top5PlayerResult = value;
+                RaisePropertyChanged();
+            }
+        }
+        private async Task EndQuizPlayerResult()
+        {
+            var playerResult = new PlayerResult
+            {
+                PlayerName = _playerName,
+                QuestionPackId = _questionPackId,
+                QuestionPackName = _questionPackName,
+                Answers = _answers,
+                TotalCorrectAnswers = _correctAnswerCount,
+                TotalQuestions = _totalQuestions,
+                TotalTime = _sessionTimer,
+                DatePlayed = DateTime.UtcNow
+
+            };
+            await _mongoDBService.SavePlayerResult(playerResult);
+            var client = new MongoClient("mongodb://localhost:27017");
+            var database = client.GetDatabase("MarkusTobin");
+            var leaderBoard = await _mongoDBService.GetTopPlayerResults(_questionPackId);
+            Top5PlayerResult = new ObservableCollection<PlayerResult>(leaderBoard);
+            Debug.WriteLine("Leaderboard updated");
+        }
+        
+        //____________________________
+        public async void StartNewQuiz(List<Question> questions)
+        {
+            
+            //______
+            QuestionPackId = _mainWindowViewModel.ActivePack.QuestionPack.Id;
+            QuestionPackName = _mainWindowViewModel.ActivePack.Name;
+            //______
             ShuffledQuestions = questions.OrderBy(q => Guid.NewGuid()).ToList();
 
             if (ShuffledQuestions.Any())
@@ -30,7 +126,8 @@ namespace Labb3___GUI.ViewModel
                 TimeRemaining = _mainWindowViewModel.ActivePack.TimeLimitInSeconds;
                 RaisePropertyChanged(nameof(TimeRemaining));
                 RaisePropertyChanged(nameof(QuestionOfTotalQuestion));
-                _timer.Start();
+                _questionTimer.Start();
+                SessionTimer = TimeSpan.Zero;
             }
             else
             {
@@ -65,10 +162,12 @@ namespace Labb3___GUI.ViewModel
                     if (_currentQuestion != null)
                     {
                         _currentAnswers = GetShuffledAnswers(CurrentQuestion);
+                        CurrentAnswerOptions = new ObservableCollection<string>(_currentAnswers);
                     }
                     else
                     {
                         _currentAnswers = Array.Empty<string>();
+                        CurrentAnswerOptions = new ObservableCollection<string>();
                     }
 
                     RaisePropertyChanged(nameof(Answer1));
@@ -83,10 +182,10 @@ namespace Labb3___GUI.ViewModel
         {
             var answers = new List<string>
         {
-        question.IncorrectAnswer1,
-        question.IncorrectAnswer2,
-        question.IncorrectAnswer3,
-        question.CorrectAnswer 
+            question.IncorrectAnswer1,
+            question.IncorrectAnswer2,
+            question.IncorrectAnswer3,
+            question.CorrectAnswer 
         };
 
             return answers.OrderBy(a => _random.Next()).ToArray();
@@ -201,25 +300,21 @@ namespace Labb3___GUI.ViewModel
             IsStartButtonVisible = false;
             IsQuizRunning = true;
             RaisePropertyChanged(nameof(TimeRemaining));
-            _timer.Start();
+            _questionTimer.Start();
         }
 
         private void ResetQuiz(object? parameter)
         {
             ResetButtonColors();
-            CurrentQuestionNumber = 1;
-            CorrectAnswerCount = 0;
+
             IsQuizFinished = false;
-            IsQuizRunning = true;
-            IsStartButtonVisible = false;
-            TimeRemaining = _mainWindowViewModel.ActivePack.TimeLimitInSeconds;
-
+            IsQuizRunning = false;
+            IsStartButtonVisible = true;
             ShuffledQuestions = ShuffledQuestions.OrderBy(q => Guid.NewGuid()).ToList();
-            CurrentQuestion = ShuffledQuestions.FirstOrDefault();
-
+            StartNewQuiz(ShuffledQuestions);
 
             RaisePropertyChanged(nameof(ShuffledQuestions));
-            _timer.Start();
+
         }
 
         private int _correctAnswerCount;
@@ -236,11 +331,12 @@ namespace Labb3___GUI.ViewModel
 
         public DelegateCommand UpdateButtonCommand { get; }
 
-        public PlayerViewModel(MainWindowViewModel? mainWindowViewModel)
+        public PlayerViewModel(MainWindowViewModel? mainWindowViewModel, MongoDBService mongoDBService)
         {
-
+            Answers = new List<PlayerAnswer>();
             CurrentQuestion = new Question();
             this._mainWindowViewModel = mainWindowViewModel;
+            _mongoDBService = mongoDBService;
 
             ShuffledQuestions = mainWindowViewModel.ActivePack.Questions.OrderBy(q => Guid.NewGuid()).ToList();
             TotalQuestions = ShuffledQuestions.Count;
@@ -250,9 +346,9 @@ namespace Labb3___GUI.ViewModel
             CorrectAnswerCount = 0;
 
             TimeRemaining = mainWindowViewModel.ActivePack?.TimeLimitInSeconds ?? 0;
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(1);
-            _timer.Tick += TimerTick;
+            _questionTimer = new DispatcherTimer();
+            _questionTimer.Interval = TimeSpan.FromSeconds(1);
+            _questionTimer.Tick += TimerTick;
 
             AnswerCommand = new DelegateCommand(AnswerSelected);
             StartTimerCommand = new DelegateCommand(StartTimer);
@@ -265,9 +361,15 @@ namespace Labb3___GUI.ViewModel
             string selectedAnswer = parameter as string;
             if (CurrentQuestion != null && selectedAnswer != null)
             {
-
                 ResetButtonColors();
 
+                var playerAnswer = new PlayerAnswer
+                {
+                    QuestionText = CurrentQuestion.Query,
+                    SelectedAnswer = selectedAnswer,
+                    CorrectAnswer = CurrentQuestion.CorrectAnswer
+                };
+                Answers.Add(playerAnswer);
 
                 if (CurrentQuestion.CorrectAnswer == selectedAnswer)
                 {
@@ -279,9 +381,43 @@ namespace Labb3___GUI.ViewModel
                     SetButtonColor(selectedAnswer, Brushes.Red);
                     SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green);
                 }
-
+                await ShowAnswerStatistics();
                 await Task.Delay(1000);
                 await NextQuestion();
+            }
+        }
+        private async Task ShowAnswerStatistics()
+        {
+            var playerResultCollection = _mongoDBService.GetPlayerResultCollection();
+            var filter = Builders<PlayerResult>.Filter.Eq("QuestionPackId", QuestionPackId);
+            var playerResults = await playerResultCollection.Find(filter).ToListAsync();
+
+            var answerCounts = new Dictionary<string, int>
+            {
+                {CurrentQuestion.CorrectAnswer, 0 },
+                {CurrentQuestion.IncorrectAnswer1, 0 },
+                {CurrentQuestion.IncorrectAnswer2, 0 },
+                {CurrentQuestion.IncorrectAnswer3, 0 }
+            };
+
+            int totalAnswers = 0;
+
+            foreach (var result in playerResults)
+            {
+                foreach (var answer in result.Answers)
+                {
+                    if (answer.QuestionText == CurrentQuestion.Query && answerCounts.ContainsKey(answer.SelectedAnswer))
+                    {
+                        answerCounts[answer.SelectedAnswer]++;
+                        totalAnswers++;
+                    }
+                }
+            }
+
+            foreach (var answer in answerCounts)
+            {
+                double percentage = totalAnswers > 0 ? (double)answer.Value / totalAnswers * 100 : 0;
+                Debug.WriteLine($"{answer.Key}: {answer.Value} players selected this answer ({percentage:F0}%).");
             }
         }
 
@@ -293,6 +429,7 @@ namespace Labb3___GUI.ViewModel
                 if (TimeRemaining > 0)
                 {
                     TimeRemaining--;
+                    _sessionTimer = _sessionTimer.Add(TimeSpan.FromSeconds(1));
                 }
                 else
                 {
@@ -311,12 +448,14 @@ namespace Labb3___GUI.ViewModel
 
                 TimeRemaining = _mainWindowViewModel.ActivePack.TimeLimitInSeconds;
                 RaisePropertyChanged(nameof(TimeRemaining));
-                _timer.Start();
+                _questionTimer.Start();
             }
             else
             {
-                _timer.Stop();
+                _questionTimer.Stop();
                 IsQuizFinished = true;
+                await EndQuizPlayerResult();
+                Debug.WriteLine("Quiz finished");
                 RaisePropertyChanged(TotalScore);
             }
         }
@@ -393,6 +532,7 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged(nameof(Option4StatusColor));
             }
         }
+
 
     }
 }

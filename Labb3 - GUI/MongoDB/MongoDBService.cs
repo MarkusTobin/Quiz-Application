@@ -16,12 +16,23 @@ namespace Labb3___GUI.MongoDB
         public IMongoCollection<QuestionPack> GetQuestionPackCollection() => _database.GetCollection<QuestionPack>("QuestionPacks");
         public IMongoCollection<Category> GetCategoriesCollection() => _database.GetCollection<Category>("Categories");
 
-        public IMongoCollection<PlayerResult> GetGameSessionCollection() => _database.GetCollection<PlayerResult>("PlayerResult");
+        public IMongoCollection<PlayerResult> GetPlayerResultCollection() => _database.GetCollection<PlayerResult>("PlayerResult");
 
-        public async Task SaveGameSession(PlayerResult playerResult)
+        public async Task SavePlayerResult(PlayerResult playerResult)
         {
-            var playerResultCollection = GetGameSessionCollection();
+            var playerResultCollection = GetPlayerResultCollection();
             await playerResultCollection.InsertOneAsync(playerResult);
+        }
+
+        public async Task<List<PlayerResult>> GetTopPlayerResults(object questionPackId)
+        {
+            var playerResultCollection = GetPlayerResultCollection();
+            return await playerResultCollection
+                .Find(r => r.QuestionPackId == questionPackId)
+                .SortByDescending(r => r.TotalCorrectAnswers)
+                .ThenBy(r => r.TotalTime)
+                .Limit(5)
+                .ToListAsync();
         }
 
         public async Task SaveToMongoDBService(List<QuestionPack> questionPacks, List<string> categories)

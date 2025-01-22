@@ -22,14 +22,27 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-
+    
     <Grid>
-        <Button Content="Start Quiz" 
-                Command="{Binding StartTimerCommand}" 
-                Visibility="{Binding IsStartButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" 
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Center"
-                FontSize="20" />
+        <StackPanel Orientation="Vertical"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Visibility="{Binding IsStartButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Text="Enter a name:" 
+                       FontSize="20" 
+                       FontWeight="Bold"  
+                       Margin="10"/>
+            
+            <TextBox x:Name="textBox"
+                     Text="{Binding PlayerName}" 
+                     FontSize="20"  
+                     Margin="10"/>
+            
+            <Button Content="Start Quiz" 
+                    IsEnabled="{Binding Text.Length, ElementName=textBox}"
+                    Command="{Binding StartTimerCommand}" 
+                    FontSize="20" />
+            </StackPanel>
 
         <StackPanel Orientation="Vertical" 
                     HorizontalAlignment="Center" 
@@ -120,5 +133,38 @@
                     HorizontalAlignment="Center"
                     Margin="10"/>
         </StackPanel>
+        <StackPanel Orientation="Vertical" 
+                        HorizontalAlignment="Right" 
+                        VerticalAlignment="Top"
+                        Margin="10"
+                        Width="150"
+                        Height="400"
+                        Visibility="{Binding IsQuizFinished, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Text="Top 5 Player Results"
+                       FontSize="12"
+                       FontWeight="Bold"
+                       Margin="10"/>
+
+                <ListBox ItemsSource="{Binding Top5PlayerResult}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                        <StackPanel>
+                            <TextBlock>
+                                <Run Text="Name:" FontWeight="Normal"/>
+                                <Run Text="{Binding PlayerName}" FontWeight="Bold"/>
+                            </TextBlock>
+                            <TextBlock>
+                                <Run Text="Correct answers:" FontWeight="Normal"/>
+                                <Run Text="{Binding TotalCorrectAnswers}" FontWeight="Bold"/>
+                            </TextBlock>
+                            <TextBlock>
+                                <Run Text="Time:" FontWeight="Normal"/>
+                                <Run Text="{Binding TotalTime}" FontWeight="Bold"/>
+                            </TextBlock>
+                        </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
     </Grid>
 </UserControl>

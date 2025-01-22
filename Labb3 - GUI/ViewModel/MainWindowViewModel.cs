@@ -39,6 +39,10 @@ namespace Labb3___GUI.ViewModel
             Task.Run(async () => await LoadFromMongoDB()).Wait();
             CategoryViewModel = new CategoryViewModel();
 
+            var client = new MongoClient("mongodb://localhost:27017");
+            var database = client.GetDatabase("MarkusTobin");
+            var mongoDBService = new MongoDBService(database);
+
             if (Packs == null || Packs.Count == 0)
             {
 
@@ -53,8 +57,8 @@ namespace Labb3___GUI.ViewModel
                 ActivePack = defaultPackViewModel;
             }
 
-            PlayerViewModel = new PlayerViewModel(this);
-            if (ActivePack?.Questions != null && ActivePack.Questions.Any())
+            PlayerViewModel = new PlayerViewModel(this, mongoDBService);
+            if (ActivePack?.Questions != null && ActivePack.Questions.Any() && IsPlayMode)
             {
                 PlayerViewModel.StartNewQuiz(ActivePack.Questions.ToList());
             }
