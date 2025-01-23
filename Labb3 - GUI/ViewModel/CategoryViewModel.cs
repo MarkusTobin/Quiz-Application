@@ -19,7 +19,6 @@ namespace Labb3___GUI.ViewModel
             Categories = categories;
             Task.Run(() => LoadCategories());
         }
-
         public async Task LoadCategories()
         {
             var client = new MongoClient("mongodb://localhost:27017");
