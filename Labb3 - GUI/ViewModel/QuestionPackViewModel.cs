@@ -11,25 +11,6 @@ namespace Labb3___GUI.ViewModel
         private readonly CategoryViewModel _categoryViewModel;
         private ObservableCollection<string> _categories;
 
-        public ObservableCollection<Question> Questions { get; }
-        public ObservableCollection<string> Categories
-        {
-            get => _categories;
-            set
-            {
-                _categories = value;
-                RaisePropertyChanged();
-                if (_categories != null && _categories.Count > 0)
-                {
-                    if (SelectedCategory != null)
-                    {
-                        return;
-                    }
-                    else
-                    SelectedCategory = _categories[0];
-                }
-            }
-        }
         public DelegateCommand OpenEditCategoriesCommand { get; set; }
 
         public QuestionPackViewModel(QuestionPack questionPack)
@@ -49,7 +30,25 @@ namespace Labb3___GUI.ViewModel
                 _questionPack.Questions.Add(question);
             }
         }
-
+        public ObservableCollection<Question> Questions { get; }
+        public ObservableCollection<string> Categories
+        {
+            get => _categories;
+            set
+            {
+                _categories = value;
+                RaisePropertyChanged();
+                if (_categories != null && _categories.Count > 0)
+                {
+                    if (SelectedCategory != null)
+                    {
+                        return;
+                    }
+                    else
+                        SelectedCategory = _categories[0];
+                }
+            }
+        }
         public QuestionPack QuestionPack => _questionPack;
         public string DisplayText => $"{Name} ({Difficulty})";
         public string Name

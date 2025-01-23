@@ -6,7 +6,6 @@ namespace Labb3___GUI.MongoDB
     class MongoDBService
     {
         private readonly IMongoDatabase _database;
-
         public MongoDBService(IMongoDatabase database)
         {
             _database = database;

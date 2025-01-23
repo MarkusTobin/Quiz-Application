@@ -10,26 +10,6 @@ namespace Labb3___GUI.ViewModel
         private ObservableCollection<string> _categories;
         private string _selectedCategory;
 
-        public ObservableCollection<string> Categories
-        {
-            get => _categories;
-            set
-            {
-                _categories = value;
-                RaisePropertyChanged();
-                if (_categories != null && _categories.Count > 0 && SelectedCategory == null) { SelectedCategory = _categories[0]; }
-            }
-        }
-
-        public string SelectedCategory
-        {
-            get => _selectedCategory;
-            set
-            {
-                _selectedCategory = value;
-                RaisePropertyChanged();
-            }
-        }
         public CategoryViewModel()
         {
             Task.Run(() => LoadCategories());
@@ -65,6 +45,27 @@ namespace Labb3___GUI.ViewModel
                 {
                     Categories.Add(category["Name"].AsString);
                 }
+            }
+        }
+
+        public ObservableCollection<string> Categories
+        {
+            get => _categories;
+            set
+            {
+                _categories = value;
+                RaisePropertyChanged();
+                if (_categories != null && _categories.Count > 0 && SelectedCategory == null) { SelectedCategory = _categories[0]; }
+            }
+        }
+
+        public string SelectedCategory
+        {
+            get => _selectedCategory;
+            set
+            {
+                _selectedCategory = value;
+                RaisePropertyChanged();
             }
         }
     }

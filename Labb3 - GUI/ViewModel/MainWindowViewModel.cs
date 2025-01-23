@@ -45,7 +45,6 @@ namespace Labb3___GUI.ViewModel
 
             if (Packs == null || Packs.Count == 0)
             {
-
                 var defaultPack = new QuestionPack("My Question Pack", Difficulty.Medium, 30, null, "No Category Set");
                 var defaultQuestion = new Question("What is 2 + 2?", "4", "3", "5", "6");
                 var defaultQuestion2 = new Question("What is 4 + 4?", "8", "3", "5", "6");
@@ -165,7 +164,6 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged(nameof(Packs));
             }
         }
-
         private void RemovePack(object parameter)
         {
             if (ActivePack != null)
@@ -175,12 +173,10 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged(nameof(ActivePack));
             }
         }
-
         private bool CanRemovePack(object parameter)
         {
             return ActivePack != null;
         }
-
         public void EditPack(object parameter)
         {
             if (ActivePack != null)
@@ -206,12 +202,10 @@ namespace Labb3___GUI.ViewModel
                 }
             }
         }
-
         private bool CanEditPack(object parameter)
         {
             return ActivePack != null;
         }
-
         public QuestionPackViewModel? ActivePack
         {
             get => _activePack;
@@ -251,7 +245,6 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged();
             }
         }
-
         private void StartQuiz(object parameter)
         {
             if (ActivePack == null || !ActivePack.Questions.Any())
@@ -267,13 +260,11 @@ namespace Labb3___GUI.ViewModel
             IsConfigMode = true;
             IsPlayMode = false;
         }
-
         private void SetPlayMode()
         {
             IsPlayMode = true;
             IsConfigMode = false;
         }
-
         private void ToggleFullScreen(object parameter)
         {
             var mainWindow = System.Windows.Application.Current.MainWindow;

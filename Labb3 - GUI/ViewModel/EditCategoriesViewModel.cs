@@ -10,30 +10,6 @@ namespace Labb3___GUI.ViewModel
 {
     internal class EditCategoriesViewModel : ViewModelBase
     {
-        public ObservableCollection<string> Categories { get; }
-        private string _newCategory;
-        public string NewCategory
-        {
-            get => _newCategory;
-            set
-            {
-                _newCategory = value;
-                RaisePropertyChanged();
-                AddCategoryCommand.RaiseCanExecuteChanged();
-            }
-        }
-        private string _selectedCategory;
-        public string SelectedCategory
-        {
-            get => _selectedCategory;
-            set
-            {
-                _selectedCategory = value;
-                RaisePropertyChanged();
-                RemoveCategoryCommand.RaiseCanExecuteChanged();
-            }
-        }
-
         public DelegateCommand AddCategoryCommand { set; get; }
         public DelegateCommand RemoveCategoryCommand { get; }
 
@@ -64,5 +40,28 @@ namespace Labb3___GUI.ViewModel
             }
         }
         private bool CanRemoveCategory(object category) => category is string categoryToRemove && Categories.Contains(categoryToRemove);
+        public ObservableCollection<string> Categories { get; }
+        private string _newCategory;
+        public string NewCategory
+        {
+            get => _newCategory;
+            set
+            {
+                _newCategory = value;
+                RaisePropertyChanged();
+                AddCategoryCommand.RaiseCanExecuteChanged();
+            }
+        }
+        private string _selectedCategory;
+        public string SelectedCategory
+        {
+            get => _selectedCategory;
+            set
+            {
+                _selectedCategory = value;
+                RaisePropertyChanged();
+                RemoveCategoryCommand.RaiseCanExecuteChanged();
+            }
+        }
     }
 }

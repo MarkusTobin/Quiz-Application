@@ -15,6 +15,20 @@ namespace Labb3___GUI.ViewModel
         public DelegateCommand RemoveButtonCommand { get; }
 
         public DelegateCommand EditPackCommand { get; }
+
+        public ConfigurationViewModel(MainWindowViewModel mainWindowViewModel)
+        {
+            this._mainWindowViewModel = mainWindowViewModel;
+            VisibilityMode = Visibility.Hidden;
+            IsEnabled = true;
+
+            AddButtonCommand = new DelegateCommand(AddButton);
+            RemoveButtonCommand = new DelegateCommand(RemoveButton, CanRemoveQuestion);
+            EditPackCommand = new DelegateCommand(EditPack, CanEditPack);
+
+            ActivePack?.Questions.Add(new Question("Question abc", "a", "b", "c", "d"));
+            ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
+        }
         public void EditPack(object? parameter)
         {
             if (ActivePack != null)
@@ -39,20 +53,23 @@ namespace Labb3___GUI.ViewModel
                 }
             }
         }
-
-        public ConfigurationViewModel(MainWindowViewModel mainWindowViewModel)
+        private void AddButton(object? parameter)
         {
-            this._mainWindowViewModel = mainWindowViewModel;
-            VisibilityMode = Visibility.Hidden;
-            IsEnabled = true;
+            VisibilityMode = Visibility.Visible;
 
-            AddButtonCommand = new DelegateCommand(AddButton);
-            RemoveButtonCommand = new DelegateCommand(RemoveButton, CanRemoveQuestion);
-            EditPackCommand = new DelegateCommand(EditPack, CanEditPack);
+            var newQuestion = new Question("Default", "1", "2", "3", "4");
+            ActivePack?.Questions.Add(newQuestion);
+            ActiveQuestion = newQuestion;
+            RemoveButtonCommand.RaiseCanExecuteChanged();
 
-            ActivePack?.Questions.Add(new Question("Question abc", "a", "b", "c", "d"));
-            ActiveQuestion = ActivePack?.Questions.FirstOrDefault();
         }
+        private void RemoveButton(object? parameter)
+        {
+            ActivePack?.Questions.Remove(ActiveQuestion);
+            ActiveQuestion = ActivePack?.Questions.LastOrDefault();
+            RemoveButtonCommand.RaiseCanExecuteChanged();
+        }
+
         private ObservableCollection<Question> _questions;
         public QuestionPackViewModel? ActivePack { get => _mainWindowViewModel.ActivePack; }
 
@@ -77,31 +94,14 @@ namespace Labb3___GUI.ViewModel
                 RemoveButtonCommand.RaiseCanExecuteChanged();
             }
         }
+
+        private Visibility _visibility;
+        public Visibility VisibilityMode { get => _visibility; set { _visibility = value; RaisePropertyChanged(); } }
         private bool RemoveActiveButton(object? arg)
         {
             return IsEnabled = true;
         }
-        private void AddButton(object? parameter)
-        {
-            VisibilityMode = Visibility.Visible;
-
-            var newQuestion = new Question("Default", "1", "2", "3", "4");
-            ActivePack?.Questions.Add(newQuestion);
-            ActiveQuestion = newQuestion;
-            RemoveButtonCommand.RaiseCanExecuteChanged();
-
-        }
-        private void RemoveButton(object? parameter)
-        {
-            ActivePack?.Questions.Remove(ActiveQuestion);
-            ActiveQuestion = ActivePack?.Questions.LastOrDefault();
-            RemoveButtonCommand.RaiseCanExecuteChanged();
-        }
-
         private bool CanRemoveQuestion(object? parameter) => ActiveQuestion != null;
-
-        private Visibility _visibility;
-        public Visibility VisibilityMode { get => _visibility; set { _visibility = value; RaisePropertyChanged(); } }
 
         private bool _isEnabled;
         public bool IsEnabled { get => _isEnabled; set { _isEnabled = value; RaisePropertyChanged(); ; } }

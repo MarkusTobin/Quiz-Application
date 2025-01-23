@@ -7,7 +7,6 @@ namespace Labb3___GUI.Model
 {
     internal class Question
     {
-
         public Question()
         {
             Query = "Default Question Text";
