@@ -22,7 +22,7 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    
+
     <Grid>
         <StackPanel Orientation="Vertical"
                     HorizontalAlignment="Center"
@@ -32,17 +32,17 @@
                        FontSize="20" 
                        FontWeight="Bold"  
                        Margin="10"/>
-            
+
             <TextBox x:Name="textBox"
                      Text="{Binding PlayerName}" 
                      FontSize="20"  
                      Margin="10"/>
-            
+
             <Button Content="Start Quiz" 
                     IsEnabled="{Binding Text.Length, ElementName=textBox}"
                     Command="{Binding StartTimerCommand}" 
                     FontSize="20" />
-            </StackPanel>
+        </StackPanel>
 
         <StackPanel Orientation="Vertical" 
                     HorizontalAlignment="Center" 
@@ -76,32 +76,64 @@
                          Width="600" 
                          Height="150">
                 <Border BorderBrush="{Binding Option1StatusColor}" BorderThickness="5" CornerRadius="10">
-                    <Button Content="{Binding Answer1}" 
-                        Command="{Binding AnswerCommand}" 
-                        CommandParameter="{Binding Answer1}" 
-                        Background="{Binding Option1StatusColor}"
-                        Style="{StaticResource QuizButtonStyle}" />
+                    <Grid>
+                        <Button Content="{Binding Answer1}" 
+                                Command="{Binding AnswerCommand}" 
+                                CommandParameter="{Binding Answer1}" 
+                                Background="{Binding Option1StatusColor}"
+                                Style="{StaticResource QuizButtonStyle}" 
+                                Height="60"/>
+                        <TextBlock Text="{Binding Option1Percentage, StringFormat={}{0:F0}%}" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Bottom"
+                                   Visibility="{Binding ShowPercentages, Converter={StaticResource BoolToVisibilityConverter}}" 
+                                   Margin="0,0,0,5"/>
+                    </Grid>
                 </Border>
                 <Border BorderBrush="{Binding Option2StatusColor}" BorderThickness="5" CornerRadius="10">
-                    <Button Content="{Binding Answer2}" 
-                        Command="{Binding AnswerCommand}" 
-                        CommandParameter="{Binding Answer2}" 
-                        Background="{Binding Option2StatusColor}"
-                        Style="{StaticResource QuizButtonStyle}" />
+                    <Grid>
+                        <Button Content="{Binding Answer2}" 
+                                Command="{Binding AnswerCommand}" 
+                                CommandParameter="{Binding Answer2}" 
+                                Background="{Binding Option2StatusColor}"
+                                Style="{StaticResource QuizButtonStyle}" 
+                                Height="60"/>
+                        <TextBlock Text="{Binding Option2Percentage, StringFormat={}{0:F0}%}" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Bottom"
+                                   Visibility="{Binding ShowPercentages, Converter={StaticResource BoolToVisibilityConverter}}" 
+                                   Margin="0,0,0,5"/>
+                    </Grid>
                 </Border>
                 <Border BorderBrush="{Binding Option3StatusColor}" BorderThickness="5" CornerRadius="10">
-                    <Button Content="{Binding Answer3}" 
-                        Command="{Binding AnswerCommand}" 
-                        CommandParameter="{Binding Answer3}" 
-                        Background="{Binding Option3StatusColor}"
-                        Style="{StaticResource QuizButtonStyle}" />
+                    <Grid>
+                        <Button Content="{Binding Answer3}" 
+                                Command="{Binding AnswerCommand}" 
+                                CommandParameter="{Binding Answer3}" 
+                                Background="{Binding Option3StatusColor}"
+                                Style="{StaticResource QuizButtonStyle}" 
+                                Height="60"/>
+                        <TextBlock Text="{Binding Option3Percentage, StringFormat={}{0:F0}%}" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Bottom"
+                                   Visibility="{Binding ShowPercentages, Converter={StaticResource BoolToVisibilityConverter}}" 
+                                   Margin="0,0,0,5"/>
+                    </Grid>
                 </Border>
                 <Border BorderBrush="{Binding Option4StatusColor}" BorderThickness="5" CornerRadius="10">
-                    <Button Content="{Binding Answer4}" 
-                        Command="{Binding AnswerCommand}" 
-                        CommandParameter="{Binding Answer4}" 
-                        Background="{Binding Option4StatusColor}"
-                        Style="{StaticResource QuizButtonStyle}" />
+                    <Grid>
+                        <Button Content="{Binding Answer4}" 
+                                Command="{Binding AnswerCommand}" 
+                                CommandParameter="{Binding Answer4}" 
+                                Background="{Binding Option4StatusColor}"
+                                Style="{StaticResource QuizButtonStyle}" 
+                                Height="60"/>
+                        <TextBlock Text="{Binding Option4Percentage, StringFormat={}{0:F0}%}" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Bottom"
+                                   Visibility="{Binding ShowPercentages, Converter={StaticResource BoolToVisibilityConverter}}" 
+                                   Margin="0,0,0,5"/>
+                    </Grid>
                 </Border>
             </UniformGrid>
         </StackPanel>
@@ -134,20 +166,21 @@
                     Margin="10"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" 
-                        HorizontalAlignment="Right" 
-                        VerticalAlignment="Top"
-                        Margin="10"
-                        Width="150"
-                        Height="400"
-                        Visibility="{Binding IsQuizFinished, Converter={StaticResource BoolToVisibilityConverter}}">
+                    HorizontalAlignment="Right" 
+                    VerticalAlignment="Top"
+                    Margin="10"
+                    Width="150"
+                    Height="400"
+                    Visibility="{Binding IsQuizFinished, Converter={StaticResource BoolToVisibilityConverter}}">
+
             <TextBlock Text="Top 5 Player Results"
                        FontSize="12"
                        FontWeight="Bold"
                        Margin="10"/>
 
-                <ListBox ItemsSource="{Binding Top5PlayerResult}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
+            <ListBox ItemsSource="{Binding Top5PlayerResult}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
                         <StackPanel>
                             <TextBlock>
                                 <Run Text="Name:" FontWeight="Normal"/>
@@ -162,9 +195,9 @@
                                 <Run Text="{Binding TotalTime}" FontWeight="Bold"/>
                             </TextBlock>
                         </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
     </Grid>
 </UserControl>

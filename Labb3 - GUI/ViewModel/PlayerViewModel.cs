@@ -110,7 +110,7 @@ namespace Labb3___GUI.ViewModel
         //____________________________
         public async void StartNewQuiz(List<Question> questions)
         {
-            
+            Answers.Clear();
             //______
             QuestionPackId = _mainWindowViewModel.ActivePack.QuestionPack.Id;
             QuestionPackName = _mainWindowViewModel.ActivePack.Name;
@@ -356,8 +356,13 @@ namespace Labb3___GUI.ViewModel
         }
 
         public string TotalScore => $"{CorrectAnswerCount} of {TotalQuestions} correct!";
+        private bool _canAnswer = true;
+
         private async void AnswerSelected(object? parameter)
         {
+            if (!_canAnswer) return;
+            _canAnswer = false;
+
             string selectedAnswer = parameter as string;
             if (CurrentQuestion != null && selectedAnswer != null)
             {
@@ -382,9 +387,11 @@ namespace Labb3___GUI.ViewModel
                     SetButtonColor(CurrentQuestion.CorrectAnswer, Brushes.Green);
                 }
                 await ShowAnswerStatistics();
-                await Task.Delay(1000);
+                ShowPercentages = true;
+                await Task.Delay(2000);
                 await NextQuestion();
             }
+            _canAnswer = true;
         }
         private async Task ShowAnswerStatistics()
         {
@@ -394,10 +401,10 @@ namespace Labb3___GUI.ViewModel
 
             var answerCounts = new Dictionary<string, int>
             {
-                {CurrentQuestion.CorrectAnswer, 0 },
-                {CurrentQuestion.IncorrectAnswer1, 0 },
-                {CurrentQuestion.IncorrectAnswer2, 0 },
-                {CurrentQuestion.IncorrectAnswer3, 0 }
+                {Answer1, 0 },
+                {Answer2, 0 },
+                {Answer3, 0 },
+                {Answer4, 0 } 
             };
 
             int totalAnswers = 0;
@@ -414,11 +421,15 @@ namespace Labb3___GUI.ViewModel
                 }
             }
 
-            foreach (var answer in answerCounts)
-            {
-                double percentage = totalAnswers > 0 ? (double)answer.Value / totalAnswers * 100 : 0;
-                Debug.WriteLine($"{answer.Key}: {answer.Value} players selected this answer ({percentage:F0}%).");
-            }
+            Option1Percentage = totalAnswers > 0 ? (double)answerCounts[Answer1] / totalAnswers * 100 : 0;
+            Option2Percentage = totalAnswers > 0 ? (double)answerCounts[Answer2] / totalAnswers * 100 : 0;
+            Option3Percentage = totalAnswers > 0 ? (double)answerCounts[Answer3] / totalAnswers * 100 : 0;
+            Option4Percentage = totalAnswers > 0 ? (double)answerCounts[Answer4] / totalAnswers * 100 : 0;
+
+            Debug.WriteLine($"{Answer1}: {Option1Percentage:F0}%");
+            Debug.WriteLine($"{Answer2}: {Option2Percentage:F0}%");
+            Debug.WriteLine($"{Answer3}: {Option3Percentage:F0}%");
+            Debug.WriteLine($"{Answer4}: {Option4Percentage:F0}%");
         }
 
         private void TimerTick(object sender, EventArgs e)
@@ -449,6 +460,7 @@ namespace Labb3___GUI.ViewModel
                 TimeRemaining = _mainWindowViewModel.ActivePack.TimeLimitInSeconds;
                 RaisePropertyChanged(nameof(TimeRemaining));
                 _questionTimer.Start();
+                ShowPercentages = false;
             }
             else
             {
@@ -457,6 +469,7 @@ namespace Labb3___GUI.ViewModel
                 await EndQuizPlayerResult();
                 Debug.WriteLine("Quiz finished");
                 RaisePropertyChanged(TotalScore);
+                ShowPercentages = false;
             }
         }
 
@@ -532,7 +545,58 @@ namespace Labb3___GUI.ViewModel
                 RaisePropertyChanged(nameof(Option4StatusColor));
             }
         }
+        private double _option1Percentage;
+        public double Option1Percentage
+        {
+            get => _option1Percentage;
+            set
+            {
+                _option1Percentage = value;
+                RaisePropertyChanged(nameof(Option1Percentage));
+            }
+        }
 
+        private double _option2Percentage;
+        public double Option2Percentage
+        {
+            get => _option2Percentage;
+            set
+            {
+                _option2Percentage = value;
+                RaisePropertyChanged(nameof(Option2Percentage));
+            }
+        }
 
+        private double _option3Percentage;
+        public double Option3Percentage
+        {
+            get => _option3Percentage;
+            set
+            {
+                _option3Percentage = value;
+                RaisePropertyChanged(nameof(Option3Percentage));
+            }
+        }
+
+        private double _option4Percentage;
+        public double Option4Percentage
+        {
+            get => _option4Percentage;
+            set
+            {
+                _option4Percentage = value;
+                RaisePropertyChanged(nameof(Option4Percentage));
+            }
+        }
+        private bool _showPercentages;
+        public bool ShowPercentages
+        {
+            get => _showPercentages;
+            set
+            {
+                _showPercentages = value;
+                RaisePropertyChanged(nameof(ShowPercentages));
+            }
+        }
     }
 }
